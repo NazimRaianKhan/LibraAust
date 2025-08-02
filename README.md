@@ -66,8 +66,5 @@ Nazim Raian Khan</br>
 
 ## UI Design
 
-[Figma Link](https://www.figma.com/make/AVtp2fWsQyHB2t7s2DxByM/LibraAust-Library-Management-UI?fullscreen=1)
+View our UI prototype on Figma: [LibraAust](https://www.figma.com/make/YtpOSa3FB7CS3hPW0d7SlH/LibraAust?fullscreen=1)
 
-![Homepage](image.png)
-
-![Bookpage](image-1.png)
