@@ -17,10 +17,11 @@ To create a digital platform that:
 Md. Aribur Rahman Dhruvo
 wakatime.com/@ARDhruvo
 
-Mohammad Yahya Bin Belal
+Mohammad Yahya Bin Belal</br>
 [![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65)
 
-Nazim Raian Khan
+Nazim Raian Khan</br>
+[![wakatime](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece.svg)](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece)
 
 ## Target Audience
 
