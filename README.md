@@ -18,6 +18,7 @@ Md. Aribur Rahman Dhruvo
 wakatime.com/@ARDhruvo
 
 Mohammad Yahya Bin Belal
+[![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65)
 
 Nazim Raian Khan
 
