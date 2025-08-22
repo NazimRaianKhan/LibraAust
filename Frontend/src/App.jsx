@@ -9,7 +9,7 @@ import Home from "./pages/Home";
 //import BookDetails from "./pages/BookDetails";
 //import Announcements from "./pages/Announcements";
 //import Resources from "./pages/Resources";
-//import Books from "./pages/Books";
+import Books from "./pages/Books";
 //import Thesis from "./pages/Thesis";
 //import Contact from "./pages/Contact";
 import ProtectedRoute from "./routes/ProtectedRoute";
@@ -23,8 +23,9 @@ export default function App() {
         <Route path="/" element={<Home />} />
         {/*
         <Route path="/resources" element={<Resources />} />
+        */}
         <Route path="/resources/books" element={<Books />} />
-        <Route path="/resources/thesis" element={<Thesis />} />
+        {/*<Route path="/resources/thesis" element={<Thesis />} />
         <Route path="/book/:id" element={<BookDetails />} />
         <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/about/rules" element={<Rules />} />
