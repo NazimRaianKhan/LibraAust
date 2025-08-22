@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom"; // remove BrowserRouter
 import Navbar from "./components/Navbar";
-//import Footer from "./components/Footer";
+import Footer from "./components/Footer";
 //import Home from "./pages/Home";
 //import Auth from "./pages/Auth";
 //import Profile from "./pages/Profile";
@@ -46,8 +46,9 @@ export default function App() {
         />
         <Route path="/contact" element={<Contact />} />
       </Routes>
-      <Footer />
       */}
+      <Footer />
+      
     </>
   );
 }
