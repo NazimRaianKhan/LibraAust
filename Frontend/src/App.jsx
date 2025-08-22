@@ -18,7 +18,36 @@ export default function App() {
   return (
     <>
       <Navbar />
-      
+      {/*
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/resources/books" element={<Books />} />
+        <Route path="/resources/thesis" element={<Thesis />} />
+        <Route path="/book/:id" element={<BookDetails />} />
+        <Route path="/about/kfr" element={<AboutKFR />} />
+        <Route path="/about/rules" element={<Rules />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute roles={["student","teacher","librarian"]}>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/manage/announcements"
+          element={
+            <ProtectedRoute roles={["librarian"]}>
+              <Announcements />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+      <Footer />
+      */}
     </>
   );
 }
