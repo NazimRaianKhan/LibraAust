@@ -1,3 +1,4 @@
+// src/App.jsx
 import { Routes, Route } from "react-router-dom"; // remove BrowserRouter
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -14,6 +15,10 @@ import Home from "./pages/Home";
 //import Contact from "./pages/Contact";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
+/* ✅ Added imports */
+import Thesis from "./pages/Thesis.jsx";
+import ThesisDetail from "./pages/ThesisDetail.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 export default function App() {
   return (
     <>
@@ -21,22 +26,27 @@ export default function App() {
       
       <Routes>
         <Route path="/" element={<Home />} />
+
+        {/* ✅ Added routes for your three pages */}
+        <Route path="/resources/thesis" element={<Thesis />} />
+        <Route path="/thesis/:id" element={<ThesisDetail />} />
+        {/*<Route
+          path="/profile"
+          element={
+            <ProtectedRoute roles={["student","teacher","librarian"]}>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />*/}
+        <Route path="/profile" element={<ProfilePage />} />
+
         {/*
         <Route path="/resources" element={<Resources />} />
         <Route path="/resources/books" element={<Books />} />
-        <Route path="/resources/thesis" element={<Thesis />} />
         <Route path="/book/:id" element={<BookDetails />} />
         <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/about/rules" element={<Rules />} />
         <Route path="/auth" element={<Auth />} />
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute roles={["student","teacher","librarian"]}>
-              <Profile />
-            </ProtectedRoute>
-          }
-        />
         <Route
           path="/manage/announcements"
           element={
@@ -50,7 +60,6 @@ export default function App() {
       </Routes>
       
       <Footer />
-      
     </>
   );
 }
