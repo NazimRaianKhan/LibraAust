@@ -114,7 +114,7 @@ export default function Navbar() {
         {/* Right side (login/profile) */}
         <div className="flex-shrink-0 flex items-center gap-2">
           {!user ? (
-            <Link to="/auth" className="btn btn-primary">
+            <Link to="/signin" className="btn btn-primary">
               Login / Sign up
             </Link>
           ) : (
