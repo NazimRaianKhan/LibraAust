@@ -1,99 +1,88 @@
-import { Formik, Form } from "formik";
-import { Link } from "react-router-dom";
-import * as Yup from "yup";
-import { toast } from "react-hot-toast";
-import TextField from "../components/TextField";
-import PasswordField from "../components/PasswordField";
+import Hero from '../components/Hero.jsx'
+import { Link } from 'react-router-dom'
+import { sampleBooks } from '../lib/data.js'
+import BookCard from '../components/BookCard.jsx'
 
-const SignInSchema = Yup.object().shape({
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string().required("Password is required"),
-});
+const Stats = () => (
+    <section className="container mx-auto px-6 -mt-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 justify-items-center">
+            {[
+                { label: 'Total Books', value: '15,000+' },
+                { label: 'Active Members', value: '3,500+' },
+                { label: 'Open Hours', value: '12 hrs/day' },
+            ].map((stat, i) => (
+                <div key={i} className="bg-white rounded-2xl shadow p-6 text-center w-full max-w-xs">
+                    <h3 className="text-2xl font-bold">{stat.value}</h3>
+                    <p className="text-gray-600">{stat.label}</p>
+                </div>
+            ))}
+        </div>
+    </section>
+)
 
-const SignIn = () => {
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      // This will be replaced with actual API call later
-      console.log("Login values:", values);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      toast.success("Welcome back!");
-
-      // Store mock tokens (will be replaced with actual API response)
-      localStorage.setItem("accessToken", "mock-token");
-      localStorage.setItem("refreshToken", "mock-refresh-token");
-
-      // Navigate to dashboard (you'll need to create this)
-      // navigate('/dashboard');
-    } catch (error) {
-      toast.error("Invalid email or password");
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
+const Featured = () => {
+  const featured = sampleBooks.slice(0, 5);
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">LibraAust</h1>
-          <h2 className="text-2xl font-semibold text-gray-800">Welcome Back</h2>
-          <p className="text-gray-600 mt-2">
-            Sign in to access your library account
-          </p>
+    <section className="container mx-auto px-6 py-12">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold">Featured Books</h2>
+          <button className="btn btn-outline">View All Books</button>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
+          {featured.map((book) => (
+            <BookCard key={book.id} item={book} />
+          ))}
+        </div>
+      </section>
+  )
+}
+
+const Announcements = () => (
+  <section className="container mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-4">Latest Announcements</h3>
+          <div className="space-y-4">
+            <div className="bg-white rounded-xl shadow p-4">
+              <h4 className="font-medium">Library Hours Extended</h4>
+              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div className="bg-white rounded-xl shadow p-4">
+              <h4 className="font-medium">New Digital Resources Available</h4>
+              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+            <div className="bg-white rounded-xl shadow p-4">
+              <h4 className="font-medium">Book Return Reminder</h4>
+              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+            </div>
+          </div>
         </div>
 
-        <Formik
-          initialValues={{
-            email: "",
-            password: "",
-          }}
-          validationSchema={SignInSchema}
-          onSubmit={handleSubmit}
-        >
-          {({ isSubmitting }) => (
-            <Form className="space-y-6">
-              <TextField
-                name="email"
-                label="Email"
-                type="email"
-                placeholder="Enter your email"
-              />
-
-              <PasswordField
-                name="password"
-                label="Password"
-                placeholder="Enter your password"
-              />
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Signing In..." : "Sign In"}
-              </button>
-            </Form>
-          )}
-        </Formik>
-
-        <div className="text-center mt-6">
-          <p className="text-gray-600">
-            Don't have an account?{" "}
-            <Link
-              to="/signup"
-              className="text-blue-600 hover:text-blue-700 font-semibold"
-            >
-              Sign up
-            </Link>
-          </p>
-        </div>
+        <div>
+      <h3 className="font-semibold mb-3">Quick Actions</h3>
+      <div className="space-y-3">
+        <Link className="card p-4 block" to="/resources">Search Resources</Link>
+        <Link className="card p-4 block" to="/about/rules">Library Rules</Link>
+        <Link className="card p-4 block" to="/contact">Contact Librarian</Link>
       </div>
     </div>
-  );
-};
+      </section>
+)
 
-export default SignIn;
+export default function Home() {
+
+  return (
+    <div>
+      
+      <Hero />
+
+      <Stats/>
+
+      <Featured/>
+
+      <Announcements/>
+
+    </div>
+  );
+}
