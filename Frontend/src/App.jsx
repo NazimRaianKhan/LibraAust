@@ -14,14 +14,14 @@ import BookDetails from "./pages/BookDetails";
 //import Resources from "./pages/Resources";
 import Books from "./pages/Books";
 //import Thesis from "./pages/Thesis";
-//import Contact from "./pages/Contact";
+import Contact from "./pages/Contact";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 export default function App() {
   return (
     <>
       <Navbar />
-      
+
       <Routes>
         <Route path="/" element={<Home />} />
         {/*
@@ -34,6 +34,7 @@ export default function App() {
         <Route path="/resources/thesis" element={<Thesis />} />
         */}
         <Route path="/books/:id" element={<BookDetails />} />
+        <Route path="/contact" element={<Contact />} />
         {/*
         <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/about/rules" element={<Rules />} />
@@ -54,7 +55,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/contact" element={<Contact />} />
+        
         */}
       </Routes>
       <Toaster
@@ -67,9 +68,8 @@ export default function App() {
           },
         }}
       />
-      
+
       <Footer />
-      
     </>
   );
 }
