@@ -1,4 +1,7 @@
 import { Routes, Route } from "react-router-dom"; // remove BrowserRouter
+import { Toaster } from "react-hot-toast";
+import SignUp from "./pages/SignUp";
+import SignIn from "./pages/SignIn";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -24,6 +27,8 @@ export default function App() {
         {/*
         <Route path="/resources" element={<Resources />} />
         */}
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
         <Route path="/resources/books" element={<Books />} />
         {/*
         <Route path="/resources/thesis" element={<Thesis />} />
@@ -52,6 +57,16 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         */}
       </Routes>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+        }}
+      />
       
       <Footer />
       
