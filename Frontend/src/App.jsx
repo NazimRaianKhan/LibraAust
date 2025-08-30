@@ -16,6 +16,7 @@ import BookDetails from "./pages/BookDetails";
 import Books from "./pages/Books";
 //import Thesis from "./pages/Thesis";
 import Contact from "./pages/Contact";
+import AddBook from "./pages/AddBook";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 /* ✅ Added imports */
@@ -56,6 +57,7 @@ export default function App() {
         {/* ✅ Keep dev’s code in the conflict: use /books/:id (not /book/:id) */}
         <Route path="/books/:id" element={<BookDetails />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/add-book" element={<AddBook />} />
         {/*
         <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/about/rules" element={<Rules />} />
