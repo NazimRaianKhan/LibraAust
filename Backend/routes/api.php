@@ -36,9 +36,21 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
 });
 
 Route::post('/login', LoginController::class)->middleware('guest:sanctum');
+
+Route::post('/logout', function (Request $request) {
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json([
+        'message' => 'Logged out successfully',
+    ], 200);
+})->middleware('auth:sanctum');
+
 Route::get('/userinfo', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
 Route::get('/studentinfo', function (Request $request) {
     return $request->user()->load('students');
 })->middleware('auth:sanctum');
+// Use ability to restrict access to certain roles
+// ->middleware('auth:sanctum', 'abilities:stuff')
