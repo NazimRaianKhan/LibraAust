@@ -66,8 +66,8 @@ const SignUp = () => {
 
       // Send the other data to usercontroller
 
-      toast.success("Registration successful!");
-      navigate("/");
+      toast.success("Registration successful! Please sign in.");
+      navigate("/signin");
     } catch (error) {
       console.error("Registration error:", error);
 

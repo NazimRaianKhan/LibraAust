@@ -35,6 +35,10 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::apiResource('users', App\Http\Controllers\Api\V1\UsersController::class);
 });
 
+Route::get('/sanctum/csrf-cookie', function () {
+    return response()->json(['message' => 'CSRF cookie set']);
+});
+
 Route::post('/login', LoginController::class)->middleware('guest:sanctum');
 
 Route::post('/logout', function (Request $request) {
