@@ -2,8 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\V1\LoginController as LoginController;
 
-// routes/api.php
 use App\Http\Controllers\PageController;
 
 Route::get('/pages/{slug}', [PageController::class, 'show']);
@@ -34,3 +34,5 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
     Route::apiResource('students', App\Http\Controllers\Api\V1\StudentsController::class);
     Route::apiResource('users', App\Http\Controllers\Api\V1\UsersController::class);
 });
+
+Route::post('/login', LoginController::class)->middleware('guest:sanctum');
