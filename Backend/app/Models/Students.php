@@ -21,8 +21,8 @@ class Students extends Model
         'password'
     ];
 
-    public function students()
+    public function user()
     {
-        return $this->belongsTo(Users::class);
+        return $this->belongsTo(Users::class, 'email', 'email');
     }
 }

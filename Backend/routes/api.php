@@ -36,3 +36,9 @@ Route::group(['prefix' => 'v1', 'namespace' => 'App\Http\Controllers\Api\V1'], f
 });
 
 Route::post('/login', LoginController::class)->middleware('guest:sanctum');
+Route::get('/userinfo', function (Request $request) {
+    return $request->user();
+})->middleware('auth:sanctum');
+Route::get('/studentinfo', function (Request $request) {
+    return $request->user()->load('students');
+})->middleware('auth:sanctum');

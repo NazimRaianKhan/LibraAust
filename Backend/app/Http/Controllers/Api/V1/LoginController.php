@@ -45,15 +45,17 @@ class LoginController extends Controller
 
         // Password matched yippee
 
+        // $token = auth()->user()->createToken('auth_token')->plainTextToken;
+        // This doesnt work for some reason?????
+
         // $user = auth()->user();
         // $token = $user->createToken('auth_token')->plainTextToken;
         // This doesnt work either bc its null or something i guess
 
         $userModel = Users::find($user->id);
         $token = $userModel->createToken('auth-token', expiresAt: now()->addDays(2))->plainTextToken;
-
-        // $token = auth()->user()->createToken('auth_token')->plainTextToken;
-        // This doesnt work for some reason?????
+        // Note to future self: This works because it has model on $userModel
+        // Why is this different? I have no idea but just know that sanctum requires model 
 
         return response()->json([
             'access_token' => $token
