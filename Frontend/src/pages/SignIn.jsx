@@ -36,6 +36,7 @@ const SignIn = () => {
       // I hate js
 
       localStorage.setItem("authToken", response.data.access_token);
+      Cookie.set("authToken", response.data.access_token);
 
       toast.success("Welcome back!");
 
