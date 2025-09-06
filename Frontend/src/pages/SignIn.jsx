@@ -1,9 +1,12 @@
 import { Formik, Form } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
 import TextField from "../components/TextField";
 import PasswordField from "../components/PasswordField";
+import api from "../services/api";
+import serv from "../services/serv.js";
+import Cookie from "js-cookie";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -11,24 +14,38 @@ const SignInSchema = Yup.object().shape({
 });
 
 const SignIn = () => {
+  const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
+      const csrfcookie = await serv.get("/sanctum/csrf-cookie");
+      console.log("CSRF COOKIE: ", csrfcookie);
+
       // This will be replaced with actual API call later
       console.log("Login values:", values);
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const submittedData = { ...values };
+
+      const response = await api.post("/login", submittedData, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      // console.log("Login response:", response.data.access_token);
+      // I hate js
+
+      localStorage.setItem("authToken", response.data.access_token);
+      Cookie.set("authToken", response.data.access_token);
 
       toast.success("Welcome back!");
 
-      // Store mock tokens (will be replaced with actual API response)
-      localStorage.setItem("accessToken", "mock-token");
-      localStorage.setItem("refreshToken", "mock-refresh-token");
+      console.log(Cookie.get("XSRF-TOKEN"));
 
-      // Navigate to dashboard (you'll need to create this)
-      // navigate('/dashboard');
+      navigate("/");
     } catch (error) {
       toast.error("Invalid email or password");
+      console.log("Login error:", error);
     } finally {
       setSubmitting(false);
     }

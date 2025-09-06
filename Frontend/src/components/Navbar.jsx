@@ -1,6 +1,9 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../state/AuthContext.jsx";
+// import { useUser } from "../context/userContext.jsx";
+import api from "../services/api.js";
+import Cookie from "js-cookie";
 
 const NavItem = ({ to, children }) => (
   <NavLink
@@ -16,12 +19,39 @@ const NavItem = ({ to, children }) => (
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  // const { isAuthenticated } = useUser();
   const navigate = useNavigate();
+  const [loggedIn, setLoggedIn] = useState(false);
 
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
+
+  // Use context and everything later
+
+  // Dummy Check
+  useEffect(() => {
+    if (Cookie.get("authToken")) {
+      setLoggedIn(true);
+    }
+  }, []);
+
+  const logoutUser = async () => {
+    const token = Cookie.get("authToken");
+    try {
+      await api.post("/logout", null, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setLoggedIn(false);
+      navigate("/");
+    }
+  };
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-200">
@@ -113,7 +143,7 @@ export default function Navbar() {
 
         {/* Right side (login/profile) */}
         <div className="flex-shrink-0 flex items-center gap-2">
-          {!user ? (
+          {!loggedIn ? (
             <Link to="/signin" className="btn btn-primary">
               Login / Sign up
             </Link>
@@ -126,9 +156,9 @@ export default function Navbar() {
                 <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
                   👤
                 </div>
-                <span className="font-medium">{user.name}</span>
+                <span className="font-medium">Profile</span>
               </button>
-              <button className="btn btn-outline" onClick={logout}>
+              <button className="btn btn-outline" onClick={logoutUser}>
                 Logout
               </button>
             </>

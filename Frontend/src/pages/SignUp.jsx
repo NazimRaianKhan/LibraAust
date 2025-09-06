@@ -1,44 +1,89 @@
 import { Formik, Form } from "formik";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import { toast } from "react-hot-toast";
+import api from "../services/api";
 import TextField from "../components/TextField";
 import PasswordField from "../components/PasswordField";
-
-const SignUpSchema = Yup.object().shape({
-  fullName: Yup.string().required("Full name is required"),
-  email: Yup.string().email("Invalid email").required("Email is required"),
-  password: Yup.string()
-    .min(8, "Password must be at least 8 characters")
-    .matches(/[a-z]/, "Password must contain at least one lowercase letter")
-    .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .matches(/[0-9]/, "Password must contain at least one number")
-    .required("Password is required"),
-  confirmPassword: Yup.string()
-    .oneOf([Yup.ref("password"), null], "Passwords must match")
-    .required("Please confirm your password"),
-});
+import {
+  FormControlLabel,
+  Checkbox,
+  FormHelperText,
+  MenuItem,
+} from "@mui/material";
 
 const SignUp = () => {
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const navigate = useNavigate();
+
+  const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
+  const semesters = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2"];
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Full name is required"),
+    student_id: Yup.number()
+      .typeError("Student ID must be a number")
+      .required("Student ID is required"),
+    department: Yup.string().required("Department is required"),
+    semester: Yup.string().required("Semester is required"),
+    phone: Yup.string().nullable(),
+    email: Yup.string()
+      .email("Invalid email")
+      .required("Email is required")
+      .test(
+        "aust-email",
+        "Email must end with @aust.edu",
+        (value) => value && value.endsWith("@aust.edu")
+      ),
+    studentship: Yup.boolean().default(true),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .matches(/[a-z]/, "Password must contain at least one lowercase letter")
+      .matches(/[A-Z]/, "Password must contain at least one uppercase letter")
+      .matches(/[0-9]/, "Password must contain at least one number")
+      .required("Password is required"),
+    password_confirmation: Yup.string()
+      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .required("Please confirm your password"),
+  });
+
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      // This will be replaced with actual API call later
-      console.log("Signup values:", values);
+      // Convert studentship to string for backend
+      const processedValues = {
+        ...values,
+        studentship: values.studentship ? "true" : "false",
+      };
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Remove password fields
+      const { password_confirmation, ...studentData } = processedValues;
 
-      toast.success(
-        "Account created successfully! Please check your email to verify."
-      );
+      const response = await api.post("/v1/students", studentData, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
 
-      // Store email for verification (will be replaced with actual API response)
-      localStorage.setItem("verificationEmail", values.email);
+      // Send the other data to usercontroller
 
-      // Navigate to verification page (you'll need to create this)
-      // navigate('/verify');
+      toast.success("Registration successful! Please sign in.");
+      navigate("/signin");
     } catch (error) {
-      toast.error("Failed to create account. Please try again.");
+      console.error("Registration error:", error);
+
+      if (error.response?.data?.errors) {
+        const laravelErrors = {};
+        Object.entries(error.response.data.errors).forEach(
+          ([key, messages]) => {
+            laravelErrors[key] = messages[0];
+          }
+        );
+        setErrors(laravelErrors);
+      }
+
+      const errorMessage =
+        error.response?.data?.message || "Registration failed";
+      toast.error(errorMessage);
     } finally {
       setSubmitting(false);
     }
@@ -51,47 +96,103 @@ const SignUp = () => {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">LibraAust</h1>
           <h2 className="text-2xl font-semibold text-gray-800">
-            Create Account
+            Student Registration
           </h2>
-          <p className="text-gray-600 mt-2">
-            Join your university library system
-          </p>
+          <p className="text-gray-600 mt-2">Create your library account</p>
         </div>
 
         <Formik
           initialValues={{
-            fullName: "",
+            name: "",
+            student_id: "",
+            department: "",
+            semester: "",
+            phone: "",
             email: "",
+            studentship: true,
             password: "",
-            confirmPassword: "",
+            password_confirmation: "",
           }}
-          validationSchema={SignUpSchema}
+          validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting }) => (
-            <Form className="space-y-6">
+          {({ isSubmitting, errors, touched, setFieldValue, values }) => (
+            <Form className="space-y-4">
+              {/* Student Information */}
               <TextField
-                name="fullName"
-                label="Full Name"
+                name="name"
+                label="Full Name *"
                 placeholder="Enter your full name"
               />
 
               <TextField
+                name="student_id"
+                label="Student ID *"
+                type="number"
+                placeholder="Enter your student ID"
+              />
+
+              <TextField name="department" label="Department *" select>
+                <MenuItem value="">Select Department</MenuItem>
+                {departments.map((dept) => (
+                  <MenuItem key={dept} value={dept}>
+                    {dept}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField name="semester" label="Semester *" select>
+                <MenuItem value="">Select Semester</MenuItem>
+                {semesters.map((sem) => (
+                  <MenuItem key={sem} value={sem}>
+                    {sem}
+                  </MenuItem>
+                ))}
+              </TextField>
+
+              <TextField
+                name="phone"
+                label="Phone Number (Optional)"
+                placeholder="Enter your phone number"
+              />
+
+              {/* Studentship Checkbox - Now properly working */}
+              <div className="mt-4">
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={values.studentship}
+                      onChange={(e) =>
+                        setFieldValue("studentship", e.target.checked)
+                      }
+                      name="studentship"
+                      color="primary"
+                    />
+                  }
+                  label="I am currently a student"
+                />
+                {touched.studentship && errors.studentship && (
+                  <FormHelperText error>{errors.studentship}</FormHelperText>
+                )}
+              </div>
+
+              {/* User Account Information */}
+              <TextField
                 name="email"
-                label="Email"
+                label="Email *"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Enter your @aust.edu email"
               />
 
               <PasswordField
                 name="password"
-                label="Password"
-                placeholder="Enter your password"
+                label="Password *"
+                placeholder="Create a password"
               />
 
               <PasswordField
-                name="confirmPassword"
-                label="Confirm Password"
+                name="password_confirmation"
+                label="Confirm Password *"
                 placeholder="Confirm your password"
               />
 
