@@ -5,6 +5,8 @@ import { toast } from "react-hot-toast";
 import TextField from "../components/TextField";
 import PasswordField from "../components/PasswordField";
 import api from "../services/api";
+import serv from "../services/serv.js";
+import Cookie from "js-cookie";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -15,7 +17,8 @@ const SignIn = () => {
   const navigate = useNavigate();
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
-      await api.get("/sanctum/csrf-cookie");
+      const csrfcookie = await serv.get("/sanctum/csrf-cookie");
+      console.log("CSRF COOKIE: ", csrfcookie);
 
       // This will be replaced with actual API call later
       console.log("Login values:", values);
@@ -35,6 +38,8 @@ const SignIn = () => {
       localStorage.setItem("authToken", response.data.access_token);
 
       toast.success("Welcome back!");
+
+      console.log(Cookie.get("XSRF-TOKEN"));
 
       navigate("/");
     } catch (error) {
