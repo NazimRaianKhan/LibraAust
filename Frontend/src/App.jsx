@@ -32,7 +32,6 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/resources/thesis" element={<Thesis />} />
-        */}
         <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/thesis/:id" element={<ThesisDetail />} />
         <Route path="/profile" element={<ProfilePage />} />
