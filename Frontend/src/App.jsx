@@ -14,6 +14,7 @@ import BookDetails from "./pages/BookDetails";
 //import Announcements from "./pages/Announcements";
 //import Resources from "./pages/Resources";
 import Books from "./pages/Books";
+import BookEdit from "./pages/BookEdit.jsx";
 //import Thesis from "./pages/Thesis";
 import Contact from "./pages/Contact";
 import AddBook from "./pages/AddBook";
@@ -32,21 +33,11 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
 
-        {/* ✅ Added routes for your three pages */}
+        
         <Route path="/resources/thesis" element={<Thesis />} />
         <Route path="/thesis/:id" element={<ThesisDetail />} />
 
-        {/* If you want to protect profile later, wrap with ProtectedRoute */}
-        {/* 
-        <Route
-          path="/profile"
-          element={
-            <ProtectedRoute roles={["student","teacher","librarian"]}>
-              <ProfilePage />
-            </ProtectedRoute>
-          }
-        />
-        */}
+        
         <Route path="/profile" element={<ProfilePage />} />
 
         {/* Other resources */}
@@ -54,24 +45,12 @@ export default function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/resources/books" element={<Books />} />
 
-        {/* ✅ Keep dev’s code in the conflict: use /books/:id (not /book/:id) */}
+       
         <Route path="/books/:id" element={<BookDetails />} />
+        <Route path="/books/:id/edit" element={<BookEdit />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/add-book" element={<AddBook />} />
-        {/*
-        <Route path="/about/kfr" element={<AboutKFR />} />
-        <Route path="/about/rules" element={<Rules />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route
-          path="/manage/announcements"
-          element={
-            <ProtectedRoute roles={["librarian"]}>
-              <Announcements />
-            </ProtectedRoute>
-          }
-        />
-        
-        */}
+       
       </Routes>
 
       <Toaster
