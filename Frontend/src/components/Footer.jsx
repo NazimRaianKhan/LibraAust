@@ -21,7 +21,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-2">Contact</h4>
           <p className="text-sm">Email: library@aust.edu</p>
-          <p className="text-sm">Phone: +880-2-123456</p>
+          <p className="text-sm">Phone: +8801882441139</p>
           <p className="text-sm">Hours: 8:00 AM – 6:00 PM</p>
         </div>
       </div>

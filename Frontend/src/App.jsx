@@ -4,7 +4,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 //import Auth from "./pages/Auth";
 //import Profile from "./pages/Profile";
-//import AboutKFR from "./pages/AboutKFR";
+import AboutKFR from "./pages/About";
 //import Rules from "./pages/Rules";
 import BookDetails from "./pages/BookDetails";
 //import Announcements from "./pages/Announcements";
@@ -28,6 +28,7 @@ export default function App() {
         {/*
         <Route path="/resources/thesis" element={<Thesis />} />
         */}
+        <Route path="/about/kfr" element={<AboutKFR />} />
         <Route path="/books/:id" element={<BookDetails />} />
         {/*
         <Route path="/about/kfr" element={<AboutKFR />} />
