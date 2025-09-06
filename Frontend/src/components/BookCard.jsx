@@ -1,11 +1,6 @@
-import { Link } from "react-router-dom";
-
 export default function BookCard({ item }) {
   return (
-    <Link
-      to={`/books/${item.id}`}
-      className="group block p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition border border-gray-100"
-    >
+    <div className="group block p-3 rounded-xl bg-white shadow-sm hover:shadow-md transition border border-gray-100">
       {/* Book Cover */}
       <div className="aspect-[3/4] overflow-hidden rounded-lg mb-3 bg-gray-100">
         <img
@@ -25,6 +20,6 @@ export default function BookCard({ item }) {
         {item.title}
       </h3>
       <p className="text-sm text-gray-600 line-clamp-1">{item.author}</p>
-    </Link>
+    </div>
   );
 }
