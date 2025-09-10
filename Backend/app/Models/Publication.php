@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Publication extends Model
 {
-    protected $fillable = [
-        'title', 'author', 'type', 'category', 'photo_url', 'year', 'description', 'tags'
-    ];
 
-    protected $casts = [
-        'tags' => 'array'
+    use HasFactory;
+  
+    protected $fillable = [
+        'title', 'author', 'isbn', 'publication_year', 'publisher',
+        'department', 'type', 'total_copies', 'available_copies',
+        'shelf_location', 'description', 'cover_url'
     ];
 }

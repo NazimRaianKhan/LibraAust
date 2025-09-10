@@ -4,17 +4,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\LoginController as LoginController;
 
-use App\Http\Controllers\PageController;
 
-Route::get('/pages/{slug}', [PageController::class, 'show']);
+use App\Http\Controllers\PublicationController;
 
-use App\Http\Controllers\BookController;
+Route::get('/publications', [PublicationController::class, 'index']);
+Route::get('/publications/{id}', [PublicationController::class, 'show']);
+Route::post('/publications', [PublicationController::class, 'store']);
+Route::put('/publications/{id}', [PublicationController::class, 'update']);
+Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 
-// All Books
-Route::get('/books', [BookController::class, 'index']);
-
-// Single Book by ID
-Route::get('/books/{id}', [BookController::class, 'show']);
 /*
 |--------------------------------------------------------------------------
 | API Routes
