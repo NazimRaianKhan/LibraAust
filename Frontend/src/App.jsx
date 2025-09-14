@@ -12,7 +12,7 @@ import Books from "./pages/Books";
 import BookEdit from "./pages/BookEdit.jsx";
 
 import Contact from "./pages/Contact";
-import AddBook from "./pages/AddBook";
+import AddPublication from "./pages/AddPublication.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 
@@ -46,7 +46,7 @@ export default function App() {
         <Route path="/books/:id/edit" element={<BookEdit />} />
         <Route path="/thesis/:id/edit" element={<ThesisEdit />} />
         <Route path="/contact" element={<Contact />} />
-        <Route path="/add-book" element={<AddBook />} />
+        <Route path="/add-publication" element={<AddPublication />} />
        
       </Routes>
 
