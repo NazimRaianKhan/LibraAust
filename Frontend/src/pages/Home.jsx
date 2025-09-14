@@ -46,15 +46,15 @@ const Announcements = () => (
           <div className="space-y-4">
             <div className="bg-white rounded-xl shadow p-4">
               <h4 className="font-medium">Library Hours Extended</h4>
-              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p className="text-sm text-gray-600">Library is open from 8:00 AM to 6:00 PM.</p>
             </div>
             <div className="bg-white rounded-xl shadow p-4">
               <h4 className="font-medium">New Digital Resources Available</h4>
-              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p className="text-sm text-gray-600">There is a computer lab in library.</p>
             </div>
             <div className="bg-white rounded-xl shadow p-4">
               <h4 className="font-medium">Book Return Reminder</h4>
-              <p className="text-sm text-gray-600">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+              <p className="text-sm text-gray-600">There is hereby to notify...</p>
             </div>
           </div>
         </div>
