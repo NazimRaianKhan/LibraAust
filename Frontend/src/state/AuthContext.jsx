@@ -1,38 +1,147 @@
-import { createContext, useContext, useState, useEffect } from 'react'
-import api from '../api/client.js'
+import { createContext, useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-hot-toast";
+import api from "../services/api";
+import serv from "../services/serv";
+import cookies from "js-cookie";
 
-const AuthContext = createContext(null)
+// Create the context
+const AuthContext = createContext({});
 
-export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+// Custom hook to use auth context
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};
 
+// Auth Provider Component
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check if user is logged in on app start
   useEffect(() => {
-    // TODO: fetch current session from Laravel if cookie-based /sanctum
-    setLoading(false)
-  }, [])
+    checkAuthStatus();
+  }, []);
 
-  const login = async (email, password) => {
-    // Example placeholder – integrate with Laravel auth route
-    // const { data } = await api.post('/login', { email, password })
-    setUser({ name: 'Nazim', role: 'student', avatar: null, email })
-  }
+  const checkAuthStatus = async () => {
+    try {
+      const token = cookies.get("authToken");
 
-  const register = async (payload) => {
-    // await api.post('/register', payload)
-    setUser({ name: payload.name, role: payload.role, email: payload.email, avatar: null })
-  }
+      if (!token) {
+        setUser(null);
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
+      // Verify token with backend
+      const response = await api.get("/userinfo", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.data) {
+        setUser(response.data);
+        setIsAuthenticated(true);
+      }
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      // Token is invalid, clear it
+      clearAuth();
+      toast.error("Session expired. Please log in again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const login = async (credentials) => {
+    try {
+      setLoading(true);
+
+      // Get CSRF cookie if needed
+      await serv.get("/sanctum/csrf-cookie");
+
+      // Make login request
+      const response = await api.post("/login", credentials, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+
+      const { access_token, user: userData } = response.data;
+
+      if (access_token) {
+        // Store token
+        cookies.set("authToken", access_token, {
+          expires: 7, // 7 days
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
+        });
+
+        // Set user state
+        setUser(userData || { email: credentials.email });
+        setIsAuthenticated(true);
+
+        toast.success("Welcome back!");
+        return { success: true };
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      const message =
+        error.response?.data?.message || "Login failed. Please try again.";
+      toast.error(message);
+      return { success: false, error: message };
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const logout = async () => {
-    // await api.post('/logout')
-    setUser(null)
-  }
+    try {
+      const token = cookies.get("authToken");
 
-  return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
-      {children}
-    </AuthContext.Provider>
-  )
-}
+      if (token) {
+        // Call logout endpoint
+        await api.post(
+          "/logout",
+          {},
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      clearAuth();
+      toast.success("Logged out successfully");
+    }
+  };
 
-export const useAuth = () => useContext(AuthContext)
+  const clearAuth = () => {
+    cookies.remove("authToken");
+    localStorage.removeItem("authToken"); // Remove if you're using localStorage too
+    setUser(null);
+    setIsAuthenticated(false);
+  };
+
+  const value = {
+    user,
+    isAuthenticated,
+    loading,
+    login,
+    logout,
+    checkAuthStatus,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

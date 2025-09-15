@@ -1,12 +1,10 @@
 import { Formik, Form } from "formik";
 import { Link, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import * as Yup from "yup";
-import { toast } from "react-hot-toast";
 import TextField from "../components/TextField";
 import PasswordField from "../components/PasswordField";
-import api from "../services/api";
-import serv from "../services/serv.js";
-import Cookie from "js-cookie";
+import { useAuth } from "../state/AuthContext";
 
 const SignInSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Email is required"),
@@ -15,41 +13,36 @@ const SignInSchema = Yup.object().shape({
 
 const SignIn = () => {
   const navigate = useNavigate();
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      const csrfcookie = await serv.get("/sanctum/csrf-cookie");
-      console.log("CSRF COOKIE: ", csrfcookie);
+  const { login, isAuthenticated, loading } = useAuth();
 
-      // This will be replaced with actual API call later
-      console.log("Login values:", values);
-
-      const submittedData = { ...values };
-
-      const response = await api.post("/login", submittedData, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      });
-
-      // console.log("Login response:", response.data.access_token);
-      // I hate js
-
-      localStorage.setItem("authToken", response.data.access_token);
-      Cookie.set("authToken", response.data.access_token);
-
-      toast.success("Welcome back!");
-
-      console.log(Cookie.get("XSRF-TOKEN"));
-
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
       navigate("/");
-    } catch (error) {
-      toast.error("Invalid email or password");
-      console.log("Login error:", error);
-    } finally {
-      setSubmitting(false);
     }
+  }, [isAuthenticated, loading, navigate]);
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    const result = await login(values);
+
+    if (result.success) {
+      navigate("/"); // Redirect on successful login
+    }
+
+    setSubmitting(false);
   };
+
+  // Show loading spinner while checking auth status
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">

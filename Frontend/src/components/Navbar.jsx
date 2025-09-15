@@ -1,9 +1,6 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useAuth } from "../state/AuthContext.jsx";
-// import { useUser } from "../context/userContext.jsx";
-import api from "../services/api.js";
-import Cookie from "js-cookie";
+import { useState } from "react";
+import { useAuth } from "../state/AuthContext";
 
 const NavItem = ({ to, children }) => (
   <NavLink
@@ -18,44 +15,21 @@ const NavItem = ({ to, children }) => (
 );
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
-  // const { isAuthenticated } = useUser();
+  const { user, isAuthenticated, logout, loading } = useAuth();
   const navigate = useNavigate();
-  const [loggedIn, setLoggedIn] = useState(false);
 
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
 
-  // Use context and everything later
-
-  // Dummy Check
-  useEffect(() => {
-    if (Cookie.get("authToken")) {
-      setLoggedIn(true);
-    }
-  }, []);
-
-  const logoutUser = async () => {
-    const token = Cookie.get("authToken");
-    try {
-      await api.post("/logout", null, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error("Logout error:", error);
-    } finally {
-      setLoggedIn(false);
-      navigate("/");
-    }
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
   };
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-200">
-      {/* ✅ Center the whole navbar */}
       <div className="container mx-auto h-16 flex items-center justify-between px-4">
         {/* Logo */}
         <div className="flex-shrink-0">
@@ -143,22 +117,32 @@ export default function Navbar() {
 
         {/* Right side (login/profile) */}
         <div className="flex-shrink-0 flex items-center gap-2">
-          {!loggedIn ? (
-            <Link to="/signin" className="btn btn-primary">
+          {loading ? (
+            <div className="h-8 w-20 bg-gray-200 rounded animate-pulse"></div>
+          ) : !isAuthenticated ? (
+            <Link
+              to="/signin"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-200"
+            >
               Login / Sign up
             </Link>
           ) : (
             <>
               <button
                 onClick={() => navigate("/profile")}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 hover:bg-gray-100 px-3 py-2 rounded-lg transition duration-200"
               >
                 <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                  👤
+                  {user?.name ? user.name.charAt(0).toUpperCase() : "👤"}
                 </div>
-                <span className="font-medium">Profile</span>
+                <span className="font-medium">
+                  {user?.name || user?.email || "Profile"}
+                </span>
               </button>
-              <button className="btn btn-outline" onClick={logoutUser}>
+              <button
+                className="border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg transition duration-200"
+                onClick={handleLogout}
+              >
                 Logout
               </button>
             </>

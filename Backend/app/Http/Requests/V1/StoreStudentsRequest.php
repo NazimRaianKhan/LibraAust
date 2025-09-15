@@ -26,7 +26,7 @@ class StoreStudentsRequest extends FormRequest
             // If it doesnt work change here
             'name' => ['required'],
             'department' => ['required', Rule::in(['CSE', 'EEE', 'BBA', 'ME', 'TE', 'CE', 'IPE', 'ARCH'])],
-            'semester' => ['required', Rule::in(['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2'])],
+            'semester' => ['required', Rule::in(['1.1', '1.2', '2.1', '2.2', '3.1', '3.2', '4.1', '4.2', '5.1', '5.2', 'NA'])],
             'email' => ['required', 'email', 'regex:/^[\w\.-]+@aust\.edu$/i',],
             'phone' => ['nullable'],
             'studentship' => ['required'],
