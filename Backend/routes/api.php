@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\LoginController as LoginController;
+use App\Http\Controllers\FacultyController as FacultyController;
 
 
 use App\Http\Controllers\PublicationController;
@@ -56,3 +57,5 @@ Route::get('/studentinfo', function (Request $request) {
 })->middleware('auth:sanctum');
 // Use ability to restrict access to certain roles
 // ->middleware('auth:sanctum', 'abilities:stuff')
+
+Route::post('/faculty', [FacultyController::class, 'store']);
