@@ -12,7 +12,7 @@ import BookDetails from "./pages/BookDetails";
 import Books from "./pages/Books";
 import BookEdit from "./pages/BookEdit.jsx";
 import Contact from "./pages/Contact";
-import AddBook from "./pages/AddBook";
+import AddPublication from "./pages/AddPublication.jsx";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Thesis from "./pages/Thesis.jsx";
 import ThesisDetail from "./pages/ThesisDetail.jsx";
@@ -37,6 +37,7 @@ export default function App() {
         <Route path="/thesis/:id" element={<ThesisDetail />} />
         <Route path="/contact" element={<Contact />} />
 
+
         {/* Protected routes - require authentication */}
         <Route
           path="/profile"
@@ -47,10 +48,10 @@ export default function App() {
           }
         />
         <Route
-          path="/add-book"
+          path="/add-publication"
           element={
             <ProtectedRoute>
-              <AddBook />
+              <AddPublication />
             </ProtectedRoute>
           }
         />
@@ -70,6 +71,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+
       </Routes>
 
       <Toaster

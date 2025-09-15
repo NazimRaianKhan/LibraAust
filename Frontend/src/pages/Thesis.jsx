@@ -4,7 +4,7 @@ import axios from "axios";
 import SearchBar from "../components/SearchBar.jsx";
 import Filters from "../components/Filters.jsx";
 import Pagination from "../components/Pagination.jsx";
-import BookCard from "../components/BookCard.jsx";
+import PublicationCard from "../components/PublicationCard.jsx";
 
 export default function Thesis() {
   const [theses, setTheses] = useState([]); // always an array → no filter error
@@ -82,7 +82,7 @@ export default function Thesis() {
               to={`/thesis/${t.id}`}
               className="block w-full hover:scale-[1.02] transition"
             >
-              <BookCard item={t} />
+              <PublicationCard item={t} />
             </Link>
           ))}
         </div>

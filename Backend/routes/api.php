@@ -11,8 +11,9 @@ use App\Http\Controllers\PublicationController;
 Route::get('/publications', [PublicationController::class, 'index']);
 Route::get('/publications/{id}', [PublicationController::class, 'show']);
 Route::post('/publications', [PublicationController::class, 'store']);
-Route::put('/publications/{id}', [PublicationController::class, 'update']);
+Route::post('/publications/{id}', [PublicationController::class, 'update']); 
 Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
+
 
 /*
 |--------------------------------------------------------------------------

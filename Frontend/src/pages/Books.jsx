@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import SearchBar from '../components/SearchBar.jsx'
 import Filters from '../components/Filters.jsx'
 import Pagination from '../components/Pagination.jsx'
-import BookCard from '../components/BookCard.jsx'
+import PublicationCard from '../components/PublicationCard.jsx'
 import axios from 'axios'
 
 export default function Books() {
@@ -49,7 +49,7 @@ export default function Books() {
             to={`/books/${b.id}`} 
             className="block w-full hover:scale-[1.02] transition"
           >
-            <BookCard item={b} />
+            <PublicationCard item={b} />
           </Link>
         ))}
       </div>

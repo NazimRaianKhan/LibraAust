@@ -1,7 +1,7 @@
 import Hero from '../components/Hero.jsx'
 import { Link } from 'react-router-dom'
 import { sampleBooks } from '../lib/data.js'
-import BookCard from '../components/BookCard.jsx'
+import PublicationCard from '../components/PublicationCard.jsx'
 
 const Stats = () => (
     <section className="container mx-auto px-6 -mt-10">
@@ -32,7 +32,7 @@ const Featured = () => {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
           {featured.map((book) => (
-            <BookCard key={book.id} item={book} />
+            <PublicationCard key={book.id} item={book} />
           ))}
         </div>
       </section>
