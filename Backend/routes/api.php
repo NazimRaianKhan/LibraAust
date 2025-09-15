@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\V1\LoginController as LoginControllerV1;
 use App\Http\Controllers\LoginController as LoginController;
 use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
-
+use App\Http\Controllers\RecommendedController as RecommendedController;
 use App\Http\Controllers\PublicationController;
 
 Route::get('/publications', [PublicationController::class, 'index']);
@@ -68,3 +68,6 @@ Route::get('/studentinfo', function (Request $request) {
 // ->middleware('auth:sanctum', 'abilities:stuff')
 
 Route::post('/faculty', [FacultyController::class, 'store']);
+
+
+Route::get('/recommended', [RecommendedController::class, 'recommended'])->middleware('auth:sanctum');
