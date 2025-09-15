@@ -11,18 +11,41 @@ import {
   FormHelperText,
   MenuItem,
 } from "@mui/material";
+import { useEffect } from "react";
 
 const SignUp = () => {
   const navigate = useNavigate();
 
+  // Idk how this works
+  const containsID = (str) => {
+    return /\d/.test(str);
+  };
+
+  const isFacultyEmail = (email) => {
+    if (!email) return false;
+    const username = email.split("@")[0];
+    return !containsID(username); // Faculty emails DONT have numbers
+  };
+
   const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
-  const semesters = ["1.1", "1.2", "2.1", "2.2", "3.1", "3.2", "4.1", "4.2"];
+  const semesters = [
+    "1.1",
+    "1.2",
+    "2.1",
+    "2.2",
+    "3.1",
+    "3.2",
+    "4.1",
+    "4.2",
+    "5.1",
+    "5.2",
+  ];
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Full name is required"),
     student_id: Yup.number()
-      .typeError("Student ID must be a number")
-      .required("Student ID is required"),
+      .typeError("ID must be a number")
+      .required("ID is required"),
     department: Yup.string().required("Department is required"),
     semester: Yup.string().required("Semester is required"),
     phone: Yup.string().nullable(),
@@ -46,25 +69,49 @@ const SignUp = () => {
       .required("Please confirm your password"),
   });
 
+  // AI blackmagic since idk how logic works apparently
+
   const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
+      // Prepare data without password confirmation
+      const { password_confirmation, ...submitData } = values;
+
+      let apiEndpoint = "/v1/students";
+      let requestData = { ...submitData };
+
+      if (!values.studentship) {
+        // Non-student registration
+        if (isFacultyEmail(values.email)) {
+          // Faculty email (no numbers) - send to faculty endpoint
+          apiEndpoint = "/faculty";
+          // Rename student_id to faculty_id for faculty
+          const { student_id, ...facultyData } = requestData;
+          requestData = {
+            ...facultyData,
+            faculty_id: student_id, // Convert student_id to faculty_id
+          };
+        } else {
+          // Non-faculty email (has numbers) - send to student endpoint
+          apiEndpoint = "/v1/students";
+          // Keep student_id as is for non-faculty non-students
+        }
+      } else {
+        // Current student - send to student endpoint, keep student_id
+        apiEndpoint = "/v1/students";
+      }
+
       // Convert studentship to string for backend
       const processedValues = {
-        ...values,
+        ...requestData,
         studentship: values.studentship ? "true" : "false",
       };
 
-      // Remove password fields
-      const { password_confirmation, ...studentData } = processedValues;
-
-      const response = await api.post("/v1/students", studentData, {
+      const response = await api.post(apiEndpoint, processedValues, {
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
       });
-
-      // Send the other data to usercontroller
 
       toast.success("Registration successful! Please sign in.");
       navigate("/signin");
@@ -95,9 +142,7 @@ const SignUp = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">LibraAust</h1>
-          <h2 className="text-2xl font-semibold text-gray-800">
-            Student Registration
-          </h2>
+          <h2 className="text-2xl font-semibold text-gray-800">Registration</h2>
           <p className="text-gray-600 mt-2">Create your library account</p>
         </div>
 
@@ -116,95 +161,120 @@ const SignUp = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ isSubmitting, errors, touched, setFieldValue, values }) => (
-            <Form className="space-y-4">
-              {/* Student Information */}
-              <TextField
-                name="name"
-                label="Full Name *"
-                placeholder="Enter your full name"
-              />
+          {({ isSubmitting, errors, touched, setFieldValue, values }) => {
+            // Automatically set semester to "NA" when studentship is false
+            useEffect(() => {
+              if (!values.studentship && values.semester !== "NA") {
+                setFieldValue("semester", "NA");
+              }
+            }, [values.studentship, setFieldValue, values.semester]);
 
-              <TextField
-                name="student_id"
-                label="Student ID *"
-                type="number"
-                placeholder="Enter your student ID"
-              />
-
-              <TextField name="department" label="Department *" select>
-                <MenuItem value="">Select Department</MenuItem>
-                {departments.map((dept) => (
-                  <MenuItem key={dept} value={dept}>
-                    {dept}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField name="semester" label="Semester *" select>
-                <MenuItem value="">Select Semester</MenuItem>
-                {semesters.map((sem) => (
-                  <MenuItem key={sem} value={sem}>
-                    {sem}
-                  </MenuItem>
-                ))}
-              </TextField>
-
-              <TextField
-                name="phone"
-                label="Phone Number (Optional)"
-                placeholder="Enter your phone number"
-              />
-
-              {/* Studentship Checkbox - Now properly working */}
-              <div className="mt-4">
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={values.studentship}
-                      onChange={(e) =>
-                        setFieldValue("studentship", e.target.checked)
-                      }
-                      name="studentship"
-                      color="primary"
-                    />
-                  }
-                  label="I am currently a student"
+            return (
+              <Form className="space-y-4">
+                {/* Student Information */}
+                <TextField
+                  name="name"
+                  label="Full Name *"
+                  placeholder="Enter your full name"
                 />
-                {touched.studentship && errors.studentship && (
-                  <FormHelperText error>{errors.studentship}</FormHelperText>
-                )}
-              </div>
 
-              {/* User Account Information */}
-              <TextField
-                name="email"
-                label="Email *"
-                type="email"
-                placeholder="Enter your @aust.edu email"
-              />
+                <TextField
+                  name="student_id"
+                  label={
+                    !values.studentship && isFacultyEmail(values.email)
+                      ? "Faculty ID *"
+                      : "Student ID *"
+                  }
+                  type="number"
+                  placeholder={
+                    !values.studentship && isFacultyEmail(values.email)
+                      ? "Enter your faculty ID"
+                      : "Enter your student ID"
+                  }
+                />
 
-              <PasswordField
-                name="password"
-                label="Password *"
-                placeholder="Create a password"
-              />
+                <TextField name="department" label="Department *" select>
+                  <MenuItem value="">Select Department</MenuItem>
+                  {departments.map((dept) => (
+                    <MenuItem key={dept} value={dept}>
+                      {dept}
+                    </MenuItem>
+                  ))}
+                </TextField>
 
-              <PasswordField
-                name="password_confirmation"
-                label="Confirm Password *"
-                placeholder="Confirm your password"
-              />
+                <TextField
+                  name="semester"
+                  label="Semester *"
+                  select
+                  disabled={!values.studentship}
+                >
+                  <MenuItem value="">Select Semester</MenuItem>
+                  {semesters.map((sem) => (
+                    <MenuItem key={sem} value={sem}>
+                      {sem}
+                    </MenuItem>
+                  ))}
+                  {!values.studentship && (
+                    <MenuItem value="NA">NA (Not Applicable)</MenuItem>
+                  )}
+                </TextField>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isSubmitting ? "Creating Account..." : "Create Account"}
-              </button>
-            </Form>
-          )}
+                <TextField
+                  name="phone"
+                  label="Phone Number (Optional)"
+                  placeholder="Enter your phone number"
+                />
+
+                {/* Studentship Checkbox */}
+                <div className="mt-4">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={values.studentship}
+                        onChange={(e) =>
+                          setFieldValue("studentship", e.target.checked)
+                        }
+                        name="studentship"
+                        color="primary"
+                      />
+                    }
+                    label="I am currently a student"
+                  />
+                  {touched.studentship && errors.studentship && (
+                    <FormHelperText error>{errors.studentship}</FormHelperText>
+                  )}
+                </div>
+
+                {/* User Account Information */}
+                <TextField
+                  name="email"
+                  label="Email *"
+                  type="email"
+                  placeholder="Enter your @aust.edu email"
+                />
+
+                <PasswordField
+                  name="password"
+                  label="Password *"
+                  placeholder="Create a password"
+                />
+
+                <PasswordField
+                  name="password_confirmation"
+                  label="Confirm Password *"
+                  placeholder="Confirm your password"
+                />
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? "Creating Account..." : "Create Account"}
+                </button>
+              </Form>
+            );
+          }}
         </Formik>
 
         <div className="text-center mt-6">
