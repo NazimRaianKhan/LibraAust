@@ -75,7 +75,12 @@ export const AuthProvider = ({ children }) => {
         },
       });
 
-      const { access_token, user: userData } = response.data;
+      // const { access_token, user: userData } = response.data;
+      const { access_token, role, name } = response.data;
+
+      console.log("Name", name);
+
+      const userData = { email: credentials.email, role, name };
 
       if (access_token) {
         // Store token
@@ -86,7 +91,7 @@ export const AuthProvider = ({ children }) => {
         });
 
         // Set user state
-        setUser(userData || { email: credentials.email });
+        setUser(userData);
         setIsAuthenticated(true);
 
         toast.success("Welcome back!");
