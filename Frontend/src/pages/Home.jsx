@@ -2,6 +2,7 @@ import Hero from '../components/Hero.jsx'
 import { Link } from 'react-router-dom'
 import { sampleBooks } from '../lib/data.js'
 import PublicationCard from '../components/PublicationCard.jsx'
+import LibraryChatbot from '../components/LibraryChatbot.jsx'
 
 const Stats = () => (
     <section className="container mx-auto px-6 -mt-10">
@@ -83,6 +84,7 @@ export default function Home() {
 
       <Announcements/>
 
+      <LibraryChatbot/>
     </div>
   );
 }

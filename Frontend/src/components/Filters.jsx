@@ -1,4 +1,4 @@
-const DEPTS = ['Arch.', 'SoB', 'CE', 'CSE', 'EEE', 'TE', 'IPE', 'ME', 'A&S']
+const DEPTS = ["CSE", "EEE", "MPE", "Textile", "Arch", "Civil"];
 
 export default function Filters({ department, onDepartmentChange }){
   return (

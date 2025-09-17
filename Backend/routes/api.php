@@ -15,6 +15,9 @@ Route::post('/publications', [PublicationController::class, 'store']);
 Route::post('/publications/{id}', [PublicationController::class, 'update']);
 Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 
+use App\Http\Controllers\ChatbotController;
+
+Route::post('/chatbot', [ChatbotController::class, 'chat']);
 
 /*
 |--------------------------------------------------------------------------
