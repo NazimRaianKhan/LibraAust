@@ -44,17 +44,21 @@ class ChatbotController extends Controller
                 try {
                     $books = $this->getRelevantBooks($userMessage);
                     if (!empty($books)) {
-                        $contextData = "\n\nAvailable books in our library:\n" . $this->formatBooksForAI($books);
+                        $contextData = "\n\nAvailable books in our AUST library database:\n" . $this->formatBooksForAI($books);
+                        $contextData .= "\n\nIMPORTANT: Only recommend the books listed above. Do not suggest any other books.";
                     } else {
                         // Get some general books if no specific matches
                         $generalBooks = $this->getGeneralBooks($userMessage);
                         if (!empty($generalBooks)) {
-                            $contextData = "\n\nHere are some available books from our library:\n" . $this->formatBooksForAI($generalBooks);
+                            $contextData = "\n\nAvailable books in our AUST library database:\n" . $this->formatBooksForAI($generalBooks);
+                            $contextData .= "\n\nIMPORTANT: Only recommend the books listed above. Do not suggest any other books.";
+                        } else {
+                            $contextData = "\n\nNo books found in our library database for this topic. You must inform the user that we don't have books on this specific topic.";
                         }
                     }
                 } catch (\Exception $e) {
                     Log::warning('Database query failed', ['error' => $e->getMessage()]);
-                    $contextData = "\n\nNote: Unable to fetch specific book recommendations at the moment.";
+                    $contextData = "\n\nNote: Unable to fetch book information from our library database. Inform user to try again later.";
                 }
             }
 
@@ -109,6 +113,8 @@ class ChatbotController extends Controller
     {
         return "You are AUST Library Assistant - a quick, helpful AI for students at Ahsanullah University of Science and Technology.
 
+CRITICAL RULE: You can ONLY recommend books that are provided to you in the 'Available books in our library' section. DO NOT recommend any books from your general knowledge. If no books are provided, you must say we don't have books on that topic.
+
 RESPONSE STYLE:
 - Give DIRECT, IMMEDIATE answers - no unnecessary questions
 - Be concise and helpful
@@ -126,17 +132,18 @@ TOPICS YOU HANDLE:
 
 BOOK RECOMMENDATION STRATEGY:
 - When someone says 'I need CSE books' or similar, ask: 'What specific area are you interested in? (e.g., programming, algorithms, databases, etc.)'
-- Then show 2-3 most relevant books with shelf locations
-- If no books match their interest, say 'Sorry, we don't have books on that specific topic' and suggest 2-3 related alternatives
+- ONLY recommend books from the 'Available books in our library' data provided to you
+- If NO books are provided in the data, say: 'Sorry, we don't currently have books on that specific topic in our library'
+- Show 2-3 most relevant books with shelf locations
+- NEVER suggest books that are not in the provided library data
 - ALWAYS include shelf location when available
-- Keep recommendations focused and limited
 
 WHAT YOU DON'T DISCUSS:
 - Non-academic topics (redirect politely to library matters)
 - Personal advice unrelated to studies
 - Entertainment or current events
 
-Be helpful but focused - quality over quantity in recommendations!";
+Be helpful but ONLY use the actual library database provided to you!";
     }
 
     private function detectBookRequest($message)
