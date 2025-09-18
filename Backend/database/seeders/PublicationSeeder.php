@@ -18,7 +18,7 @@ class PublicationSeeder extends Seeder
                 'isbn' => "ISBN-" . rand(100000, 999999),
                 'publication_year' => rand(2000, 2022),
                 'publisher' => "Publisher " . rand(1, 5),
-                'department' => ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"][array_rand(["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"])],
+                'department' => ['CSE', 'EEE', 'MPE', 'Textile', 'Arch', 'Civil'][array_rand(['CSE', 'EEE', 'MPE', 'Textile', 'Arch', 'Civil'])],
                 'type' => 'book',
                 'total_copies' => rand(5, 20),
                 'available_copies' => rand(1, 15),
