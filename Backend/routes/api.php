@@ -15,6 +15,28 @@ Route::post('/publications', [PublicationController::class, 'store']);
 Route::post('/publications/{id}', [PublicationController::class, 'update']);
 Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 
+use App\Http\Controllers\BorrowController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // Borrow a publication
+    Route::post('/publications/{id}/borrow', [BorrowController::class, 'borrowPublication']);
+    
+    // Return a borrowed publication
+    Route::post('/borrows/{id}/return', [BorrowController::class, 'returnPublication']);
+    
+    // Get current user's borrowing history
+    Route::get('/my-borrows', [BorrowController::class, 'getUserBorrows']);
+    
+    // Librarian only routes
+    Route::middleware('role:librarian')->group(function () {
+        // Get all borrow records
+        Route::get('/borrows', [BorrowController::class, 'getAllBorrows']);
+        
+        // Get borrowing statistics
+        Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
