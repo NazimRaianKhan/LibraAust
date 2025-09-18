@@ -352,7 +352,7 @@ class BorrowController extends Controller
                     ->lockForUpdate()
                     ->first();
 
-                if (!borrow) {
+                if (!$borrow) {
                     return response()->json(['message' => 'Borrow record not found or no fine to clear'], 404);
                 }
 
