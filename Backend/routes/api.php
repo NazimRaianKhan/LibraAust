@@ -16,6 +16,11 @@ Route::post('/publications', [PublicationController::class, 'store']);
 Route::post('/publications/{id}', [PublicationController::class, 'update']);
 Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 
+
+use App\Http\Controllers\ChatbotController;
+
+Route::post('/chatbot', [ChatbotController::class, 'chat']);
+
 use App\Http\Controllers\BorrowController;
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -38,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
     });
 });
+
 
 /*
 |--------------------------------------------------------------------------
