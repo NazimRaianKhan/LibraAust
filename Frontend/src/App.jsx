@@ -18,6 +18,7 @@ import Thesis from "./pages/Thesis.jsx";
 import ThesisDetail from "./pages/ThesisDetail.jsx";
 import ThesisEdit from "./pages/ThesisEdit.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
+import MyBorrows from "./pages/MyBorrows.jsx";
 
 export default function App() {
   return (
@@ -71,6 +72,7 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/my-borrows" element={<MyBorrows />} />
 
       </Routes>
 

@@ -8,6 +8,7 @@ use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
 
 use App\Http\Controllers\PublicationController;
+use App\Http\Controllers\LibrarianController as LibrarianController;
 
 Route::get('/publications', [PublicationController::class, 'index']);
 Route::get('/publications/{id}', [PublicationController::class, 'show']);
@@ -15,9 +16,34 @@ Route::post('/publications', [PublicationController::class, 'store']);
 Route::post('/publications/{id}', [PublicationController::class, 'update']);
 Route::delete('/publications/{id}', [PublicationController::class, 'destroy']);
 
+
 use App\Http\Controllers\ChatbotController;
 
 Route::post('/chatbot', [ChatbotController::class, 'chat']);
+
+use App\Http\Controllers\BorrowController;
+
+Route::middleware('auth:sanctum')->group(function () {
+    
+    // Borrow a publication
+    Route::post('/publications/{id}/borrow', [BorrowController::class, 'borrowPublication']);
+    
+    // Return a borrowed publication
+    Route::post('/borrows/{id}/return', [BorrowController::class, 'returnPublication']);
+    
+    // Get current user's borrowing history
+    Route::get('/my-borrows', [BorrowController::class, 'getUserBorrows']);
+    
+    // Librarian only routes
+    Route::middleware('role:librarian')->group(function () {
+        // Get all borrow records
+        Route::get('/borrows', [BorrowController::class, 'getAllBorrows']);
+        
+        // Get borrowing statistics
+        Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
+    });
+});
+
 
 /*
 |--------------------------------------------------------------------------
@@ -70,4 +96,12 @@ Route::get('/studentinfo', function (Request $request) {
 // Use ability to restrict access to certain roles
 // ->middleware('auth:sanctum', 'abilities:stuff')
 
+
 Route::post('/faculty', [FacultyController::class, 'store']);
+
+
+Route::get('/recommended', [RecommendedController::class, 'recommended'])->middleware('auth:sanctum');
+Route::get('/featured', [RecommendedController::class, 'featured']);
+
+Route::get('/librarian', [LibrarianController::class, 'librarians']);
+Route::post('/librarian', [LibrarianController::class, 'create']);
