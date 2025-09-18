@@ -35,8 +35,15 @@ const Featured = () => {
     const fetchBooks = async () => {
       if (!isAuthenticated) {
         // Make separate api for latest books for unauth users
-        setFeatured(sampleBooks.slice(0, 5));
-        return;
+        try {
+          const response = await api.get("/featured");
+          setFeatured(response.data.slice(0, 5));
+          return;
+        } catch (error) {
+          console.error("Failed to fetch featured books:", error);
+          setFeatured(sampleBooks.slice(0, 5));
+          return;
+        }
       }
 
       const token = cookies.get("authToken");
