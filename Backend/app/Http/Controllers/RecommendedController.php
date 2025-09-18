@@ -33,4 +33,13 @@ class RecommendedController extends Controller
 
         return response()->json($books);
     }
+
+    public function featured()
+    {
+        $books = Publication::where('type', 'book')
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get();
+        return response()->json($books);
+    }
 }

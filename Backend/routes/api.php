@@ -71,3 +71,4 @@ Route::post('/faculty', [FacultyController::class, 'store']);
 
 
 Route::get('/recommended', [RecommendedController::class, 'recommended'])->middleware('auth:sanctum');
+Route::get('/featured', [RecommendedController::class, 'featured']);
