@@ -14,7 +14,7 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->geminiApiKey = "AIzaSyBCXZ_nPrwwfXqYS9VQUQC_zAWo39KeCL0";
+        $this->geminiApiKey = config('services.gemini.key'); 
     }
 
     public function chat(Request $request)
@@ -47,18 +47,11 @@ class ChatbotController extends Controller
                         $contextData = "\n\nAvailable books in our AUST library database:\n" . $this->formatBooksForAI($books);
                         $contextData .= "\n\nIMPORTANT: Only recommend the books listed above. Do not suggest any other books.";
                     } else {
-                        // Get some general books if no specific matches
-                        $generalBooks = $this->getGeneralBooks($userMessage);
-                        if (!empty($generalBooks)) {
-                            $contextData = "\n\nAvailable books in our AUST library database:\n" . $this->formatBooksForAI($generalBooks);
-                            $contextData .= "\n\nIMPORTANT: Only recommend the books listed above. Do not suggest any other books.";
-                        } else {
-                            $contextData = "\n\nNo books found in our library database for this topic. You must inform the user that we don't have books on this specific topic.";
-                        }
+                        $contextData = "\n\nNo books found in our library database for this topic. Tell the user that books on this topic are not available in our library. Do not recommend any other books.";
                     }
                 } catch (\Exception $e) {
                     Log::warning('Database query failed', ['error' => $e->getMessage()]);
-                    $contextData = "\n\nNote: Unable to fetch book information from our library database. Inform user to try again later.";
+                    $contextData = "\n\nUnable to fetch book information. Tell user to try again later.";
                 }
             }
 
@@ -75,10 +68,10 @@ class ChatbotController extends Controller
                     ]
                 ],
                 'generationConfig' => [
-                    'temperature' => 0.7,
-                    'topK' => 40,
-                    'topP' => 0.95,
-                    'maxOutputTokens' => 1024,
+                    'temperature' => 0.5,
+                    'topK' => 20,
+                    'topP' => 0.8,
+                    'maxOutputTokens' => 512,
                 ]
             ]);
 
@@ -111,53 +104,40 @@ class ChatbotController extends Controller
 
     private function getSystemPrompt()
     {
-        return "You are AUST Library Assistant - a quick, helpful AI for students at Ahsanullah University of Science and Technology.
+        return "You are AUST Library Assistant for Ahsanullah University of Science and Technology.
 
-CRITICAL RULE: You can ONLY recommend books that are provided to you in the 'Available books in our library' section. DO NOT recommend any books from your general knowledge. If no books are provided, you must say we don't have books on that topic.
-
-RESPONSE STYLE:
-- Give DIRECT, IMMEDIATE answers - no unnecessary questions
-- Be concise and helpful
-- When recommending books, show only 2-3 most relevant ones
-- If someone asks for department books, ask ONE question about their specific interest area first
-- Don't overwhelm with too many book suggestions
+STRICT RULE: You can ONLY mention books that are provided in the 'Available books in our AUST library database' section. If no books are provided, say the topic is not available.
 
 TOPICS YOU HANDLE:
 - Library hours: 8:00 AM to 6:00 PM
-- Book recommendations for departments: CSE, EEE, MPE, Textile, Architecture, Civil
-- Academic resources and study help
+- Book recommendations (books and thesis) for: CSE, EEE, MPE, Textile, Architecture, Civil
 - Library location: AUST Campus, Tejgaon, Dhaka
 - Book locations and shelf information
-- Research materials and thesis help
 
-BOOK RECOMMENDATION STRATEGY:
-- When someone says 'I need CSE books' or similar, ask: 'What specific area are you interested in? (e.g., programming, algorithms, databases, etc.)'
-- ONLY recommend books from the 'Available books in our library' data provided to you
-- If NO books are provided in the data, say: 'Sorry, we don't currently have books on that specific topic in our library'
-- Show 2-3 most relevant books with shelf locations
-- NEVER suggest books that are not in the provided library data
-- ALWAYS include shelf location when available
+RESPONSE RULES:
+- Be direct and concise
+- If someone asks for department books, ask what specific area they're interested in
+- Only show books from the provided database list
+- If no books provided, say: 'Books on this topic are not available in our library'
+- Include shelf location when showing books
+- Handle both books and thesis requests
 
-WHAT YOU DON'T DISCUSS:
-- Non-academic topics (redirect politely to library matters)
-- Personal advice unrelated to studies
-- Entertainment or current events
-
-Be helpful but ONLY use the actual library database provided to you!";
+NEVER suggest books not in the provided database.";
     }
 
     private function detectBookRequest($message)
     {
-        $bookKeywords = [
-            'book', 'books', 'recommend', 'recommendation', 'suggestions', 'suggest',
-            'read', 'study', 'thesis', 'research', 'department', 'dept', 
-            'CSE', 'cse', 'EEE', 'eee', 'MPE', 'mpe', 'Textile', 'textile', 
-            'Architecture', 'architecture', 'Civil', 'civil', 'programming', 
-            'engineering', 'mathematics', 'physics', 'computer', 'software',
-            'where is', 'location', 'shelf', 'find', 'located'
+        $keywords = [
+            'book', 'books', 'recommend', 'thesis', 'research', 
+            'CSE', 'EEE', 'MPE', 'Textile', 'Architecture', 'Civil',
+            'programming', 'algorithm', 'database', 'network',
+            'circuit', 'electronics', 'power', 'signal',
+            'fabric', 'dyeing', 'manufacturing',
+            'construction', 'design', 'structural',
+            'where is', 'location', 'shelf'
         ];
        
-        foreach ($bookKeywords as $keyword) {
+        foreach ($keywords as $keyword) {
             if (stripos($message, $keyword) !== false) {
                 return true;
             }
@@ -167,130 +147,97 @@ Be helpful but ONLY use the actual library database provided to you!";
 
     private function getRelevantBooks($message)
     {
-        if (!class_exists('App\Models\Publication')) {
-            Log::warning('Publication model does not exist');
-            return collect();
-        }
-
         try {
             $query = Publication::query();
 
-            // Check if user is asking for a specific book location
-            if (stripos($message, 'where is') !== false || stripos($message, 'location') !== false || stripos($message, 'find') !== false) {
-                // Try to extract book title from the question
-                $words = explode(' ', $message);
-                $potentialTitle = '';
-                $foundWhere = false;
+            // Handle book location queries
+            if (stripos($message, 'where is') !== false || stripos($message, 'location') !== false) {
+                $words = explode(' ', strtolower($message));
+                $titleWords = [];
+                $found = false;
                 
                 foreach ($words as $word) {
-                    if ($foundWhere && !in_array(strtolower($word), ['book', 'the', 'a', 'an', 'is', 'located', 'at'])) {
-                        $potentialTitle .= $word . ' ';
+                    if ($found && !in_array($word, ['book', 'the', 'a', 'an', 'is', 'located'])) {
+                        $titleWords[] = $word;
                     }
-                    if (stripos($word, 'where') !== false || stripos($word, 'location') !== false) {
-                        $foundWhere = true;
+                    if (in_array($word, ['where', 'location'])) {
+                        $found = true;
                     }
                 }
                 
-                if (trim($potentialTitle)) {
-                    $query->where('title', 'LIKE', '%' . trim($potentialTitle) . '%');
-                    return $query->limit(2)->get();
+                if (!empty($titleWords)) {
+                    $searchTerm = implode(' ', $titleWords);
+                    return $query->where('title', 'LIKE', "%{$searchTerm}%")->limit(2)->get();
                 }
             }
 
-            // Check if user mentions both department and specific interest
+            // Check for department
             $departments = ['CSE', 'EEE', 'MPE', 'Textile', 'Arch', 'Civil'];
-            $foundDepartment = false;
-            $hasSpecificInterest = false;
+            $foundDept = false;
             
             foreach ($departments as $dept) {
                 if (stripos($message, $dept) !== false) {
                     $query->where('department', $dept);
-                    $foundDepartment = true;
+                    $foundDept = true;
                     break;
                 }
             }
 
-            // Check if message has specific interest keywords
-            $specificInterests = [
-                'programming', 'code', 'coding', 'java', 'python', 'cpp', 'javascript',
-                'database', 'sql', 'algorithm', 'data structure', 'machine learning', 'ai',
-                'networking', 'security', 'web development', 'mobile app',
-                'mathematics', 'calculus', 'algebra', 'statistics',
-                'physics', 'mechanics', 'thermodynamics', 'electronics',
-                'engineering', 'design', 'construction', 'structural',
-                'textile', 'fabric', 'fiber', 'fashion', 'material',
-                'architecture', 'building', 'planning', 'interior'
-            ];
-
-            foreach ($specificInterests as $interest) {
-                if (stripos($message, $interest) !== false) {
-                    $hasSpecificInterest = true;
-                    $query->where(function($q) use ($interest) {
-                        $q->where('title', 'LIKE', "%{$interest}%")
-                          ->orWhere('description', 'LIKE', "%{$interest}%")
-                          ->orWhere('author', 'LIKE', "%{$interest}%");
-                    });
-                    break;
-                }
-            }
-
-            // If only department mentioned without specific interest, return empty
-            // (AI will ask for specific interest)
-            if ($foundDepartment && !$hasSpecificInterest) {
-                // Check if this is a general request like "CSE books" without specifics
-                $generalRequests = ['books', 'book', 'need', 'want', 'show', 'recommend'];
-                $isGeneralRequest = false;
-                
-                foreach ($generalRequests as $general) {
-                    if (stripos($message, $general) !== false) {
-                        $isGeneralRequest = true;
-                        break;
-                    }
-                }
-                
-                if ($isGeneralRequest) {
-                    return collect(); // Return empty to trigger interest question
-                }
-            }
-
-            // Check for type mentions
+            // Check for thesis specifically
             if (stripos($message, 'thesis') !== false) {
                 $query->where('type', 'thesis');
             } elseif (stripos($message, 'book') !== false) {
                 $query->where('type', 'book');
             }
 
+            // Check for specific interests
+            $interests = [
+                'programming' => ['programming', 'java', 'code', 'coding'],
+                'algorithm' => ['algorithm', 'data structure'],
+                'database' => ['database', 'sql'],
+                'network' => ['network', 'networking'],
+                'circuit' => ['circuit', 'electronics'],
+                'power' => ['power', 'electrical'],
+                'signal' => ['signal', 'processing'],
+                'fabric' => ['fabric', 'textile'],
+                'dyeing' => ['dyeing', 'printing'],
+                'manufacturing' => ['manufacturing', 'production'],
+                'construction' => ['construction', 'building'],
+                'design' => ['design', 'planning'],
+                'structural' => ['structural', 'analysis'],
+                'concrete' => ['concrete', 'material'],
+                'thermodynamics' => ['thermodynamics', 'thermal'],
+                'machine' => ['machine', 'mechanical']
+            ];
+
+            $hasSpecificInterest = false;
+            foreach ($interests as $category => $terms) {
+                foreach ($terms as $term) {
+                    if (stripos($message, $term) !== false) {
+                        $query->where(function($q) use ($term) {
+                            $q->where('title', 'LIKE', "%{$term}%")
+                              ->orWhere('description', 'LIKE', "%{$term}%");
+                        });
+                        $hasSpecificInterest = true;
+                        break 2;
+                    }
+                }
+            }
+
+            // If department mentioned but no specific interest, return empty (AI will ask)
+            if ($foundDept && !$hasSpecificInterest) {
+                $generalRequests = ['books', 'book', 'need', 'want', 'show', 'recommend', 'thesis'];
+                foreach ($generalRequests as $general) {
+                    if (stripos($message, $general) !== false) {
+                        return collect(); // Empty to trigger interest question
+                    }
+                }
+            }
+
             return $query->where('available_copies', '>', 0)->limit(3)->get();
            
         } catch (\Exception $e) {
-            Log::error('Database query failed in getRelevantBooks', ['error' => $e->getMessage()]);
-            return collect();
-        }
-    }
-
-    private function getGeneralBooks($message)
-    {
-        try {
-            // If no specific books found, get 2-3 popular books from the requested department
-            $departments = ['CSE', 'EEE', 'MPE', 'Textile', 'Arch', 'Civil'];
-            
-            foreach ($departments as $dept) {
-                if (stripos($message, $dept) !== false) {
-                    return Publication::where('department', $dept)
-                                     ->where('available_copies', '>', 0)
-                                     ->orderBy('total_copies', 'desc')
-                                     ->limit(2)
-                                     ->get();
-                }
-            }
-            
-            // If no department specified, get general popular books
-            return Publication::where('available_copies', '>', 0)
-                             ->orderBy('total_copies', 'desc')
-                             ->limit(2)
-                             ->get();
-        } catch (\Exception $e) {
-            Log::error('Failed to get general books', ['error' => $e->getMessage()]);
+            Log::error('Database query failed: ' . $e->getMessage());
             return collect();
         }
     }
@@ -304,14 +251,13 @@ Be helpful but ONLY use the actual library database provided to you!";
             if ($book->publication_year) $formatted .= " [{$book->publication_year}]";
             $formatted .= " - {$book->available_copies} available";
             
-            // Add shelf location if available
             if ($book->shelf_location) {
                 $formatted .= " 📍 Location: {$book->shelf_location}";
             }
             
             if ($book->description) {
-                $shortDesc = substr(strip_tags($book->description), 0, 80);
-                $formatted .= " - " . $shortDesc . (strlen($book->description) > 80 ? "..." : "");
+                $shortDesc = substr($book->description, 0, 60);
+                $formatted .= " - " . $shortDesc . "...";
             }
             $formatted .= "\n";
         }
