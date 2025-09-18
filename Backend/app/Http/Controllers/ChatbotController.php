@@ -14,8 +14,9 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->geminiApiKey = "AIzaSyBCXZ_nPrwwfXqYS9VQUQC_zAWo39KeCL0";
+        $this->geminiApiKey = config('services.gemini.key'); 
     }
+
 
     public function chat(Request $request)
     {
