@@ -38,32 +38,6 @@ export default function MyBorrows() {
     }
   };
 
-  const handleReturn = async (borrowId) => {
-    try {
-      const token = cookies.get("authToken");
-      const res = await axios.post(
-        `http://localhost:8000/api/borrows/${borrowId}/return`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      
-      if (res.data.fine > 0) {
-        toast.success(`Book returned successfully! Fine: ${res.data.fine} Taka`, {
-          duration: 5000
-        });
-      } else {
-        toast.success('Book returned successfully!');
-      }
-      
-      fetchBorrows(); // Refresh the list
-    } catch (err) {
-      console.error('Failed to return book:', err);
-      toast.error('Failed to return book: ' + (err.response?.data?.message || err.message));
-    }
-  };
-
   const getStatusBadge = (status, returnDate) => {
     const today = new Date();
     const dueDate = new Date(returnDate);
@@ -128,7 +102,7 @@ export default function MyBorrows() {
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Librarian Account</h2>
           <p className="text-gray-600 mb-6">Librarians don't have personal borrowing history.</p>
           <Link 
-            to="/admin/borrows"
+            to="/manage-borrows"
             className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Manage All Borrows
@@ -142,10 +116,16 @@ export default function MyBorrows() {
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2">My Borrowed Books</h1>
-        <p className="text-gray-600">Track your borrowing history and manage returns</p>
+        <p className="text-gray-600">Track your borrowing history and due dates</p>
         {user && (
           <p className="text-sm text-gray-500 mt-1">Welcome back, {user.name}!</p>
         )}
+        <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            📋 <strong>Note:</strong> To return books, please visit the library in person. 
+            The librarian will process your return and update the system.
+          </p>
+        </div>
       </div>
 
       {borrows.length === 0 ? (
@@ -188,9 +168,6 @@ export default function MyBorrows() {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Fine
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
                   </th>
                 </tr>
               </thead>
@@ -236,6 +213,11 @@ export default function MyBorrows() {
                             }
                           </div>
                         )}
+                        {borrow.actual_return_date && (
+                          <div className="text-xs text-green-600">
+                            Returned: {formatDate(borrow.actual_return_date)}
+                          </div>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(borrow.status, borrow.return_date)}
@@ -247,25 +229,25 @@ export default function MyBorrows() {
                           '-'
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        {borrow.status === 'borrowed' || borrow.status === 'overdue' ? (
-                          <button
-                            onClick={() => handleReturn(borrow.id)}
-                            className="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 px-3 py-1 rounded-md transition-colors"
-                          >
-                            Return Book
-                          </button>
-                        ) : (
-                          <span className="text-gray-500 text-xs">
-                            Returned {formatDate(borrow.actual_return_date)}
-                          </span>
-                        )}
-                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Return Instructions */}
+      {borrows.some(b => b.status === 'borrowed' || b.status === 'overdue') && (
+        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h3 className="text-lg font-medium text-yellow-800 mb-2">📖 How to Return Books</h3>
+          <div className="text-sm text-yellow-700 space-y-2">
+            <p>• Visit the library during operating hours</p>
+            <p>• Bring your books to the librarian's desk</p>
+            <p>• The librarian will scan and process your return</p>
+            <p>• Any fines will be calculated and need to be paid at the library</p>
+            <p>• Your borrowing history will be updated automatically</p>
           </div>
         </div>
       )}
