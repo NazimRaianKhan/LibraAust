@@ -8,6 +8,7 @@ use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
 
 use App\Http\Controllers\PublicationController;
+use App\Http\Controllers\LibrarianController as LibrarianController;
 
 Route::get('/publications', [PublicationController::class, 'index']);
 Route::get('/publications/{id}', [PublicationController::class, 'show']);
@@ -89,4 +90,12 @@ Route::get('/studentinfo', function (Request $request) {
 // Use ability to restrict access to certain roles
 // ->middleware('auth:sanctum', 'abilities:stuff')
 
+
 Route::post('/faculty', [FacultyController::class, 'store']);
+
+
+Route::get('/recommended', [RecommendedController::class, 'recommended'])->middleware('auth:sanctum');
+Route::get('/featured', [RecommendedController::class, 'featured']);
+
+Route::get('/librarian', [LibrarianController::class, 'librarians']);
+Route::post('/librarian', [LibrarianController::class, 'create']);

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Users;
 use App\Models\Students;
 use App\Models\Faculties;
-// use App\Models\Librarians; // Uncomment if you add a Librarians model
+use App\Models\Librarians; // Uncomment if you add a Librarians model
 
 class LoginController extends Controller
 {
@@ -66,9 +66,9 @@ class LoginController extends Controller
             $name = Faculties::where('email', $user->email)->value('name');
         }
         // Uncomment when yall add Librarians
-        // else {
-        //     $name = Librarians::where('email', $user->email)->value('name');
-        // }
+        else {
+            $name = Librarians::where('email', $user->email)->value('name');
+        }
 
 
         return response()->json([
