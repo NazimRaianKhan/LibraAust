@@ -1,8 +1,12 @@
 // src/pages/AddPublication.jsx
 import { useState } from "react";
 import axios from "axios";
+import { useAuth } from "../state/AuthContext"; // Add this import
+import { toast } from "react-hot-toast"; // Add this import
+import cookies from "js-cookie"; // Add this import
 
 export default function AddPublication() {
+  const { user, isAuthenticated } = useAuth(); // Add this
   const [form, setForm] = useState({
     title: "",
     author: "",
@@ -43,14 +47,20 @@ export default function AddPublication() {
   async function handleSubmit(e) {
     e.preventDefault();
 
+    // Check if user is librarian
+    if (!isAuthenticated || user?.role !== 'librarian') {
+      toast.error("Only librarians can add publications");
+      return;
+    }
+
     // Validation (frontend side)
     if (Number(form.available_copies) > Number(form.total_copies)) {
-      alert("Available copies cannot exceed total copies");
+      toast.error("Available copies cannot exceed total copies");
       return;
     }
 
     if (form.publication_year && (form.publication_year < 1000 || form.publication_year > currentYear)) {
-      alert(`Publication year must be between 1000 and ${currentYear}`);
+      toast.error(`Publication year must be between 1000 and ${currentYear}`);
       return;
     }
 
@@ -60,11 +70,17 @@ export default function AddPublication() {
       Object.entries(form).forEach(([k, v]) => fd.append(k, v));
       if (file) fd.append("cover", file);
 
+      const token = cookies.get("authToken");
+
+      // DON'T set Content-Type header manually - let browser set it
       await axios.post("http://localhost:8000/api/publications", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
+        headers: { 
+          Authorization: `Bearer ${token}`
+          // Remove the Content-Type header - browser will set it automatically with boundary
+        },
       });
 
-      alert("Publication added!");
+      toast.success("Publication added successfully!");
       // reset form
       setForm({
         title: "",
@@ -83,10 +99,39 @@ export default function AddPublication() {
       setPreviewUrl(null);
     } catch (err) {
       console.error(err);
-      alert("Failed to add publication");
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || "Failed to add publication";
+      toast.error(errorMessage);
+      
+      // Log detailed error for debugging
+      if (err.response?.data?.errors) {
+        console.error("Validation errors:", err.response.data.errors);
+      }
     } finally {
       setLoading(false);
     }
+  }
+
+  // Check if user is librarian
+  if (!isAuthenticated) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Authentication Required</h2>
+          <p className="text-gray-600 mb-6">Please log in to add publications.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (user?.role !== 'librarian') {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
+          <p className="text-gray-600 mb-6">Only librarians can add publications.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -105,7 +150,7 @@ export default function AddPublication() {
             value={form.title}
             onChange={handleChange}
             required
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter publication title"
           />
         </div>
@@ -118,7 +163,7 @@ export default function AddPublication() {
             value={form.author}
             onChange={handleChange}
             required
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter author name"
           />
         </div>
@@ -131,7 +176,7 @@ export default function AddPublication() {
               name="isbn"
               value={form.isbn}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="ISBN (optional)"
             />
           </div>
@@ -146,7 +191,7 @@ export default function AddPublication() {
               type="number"
               min="1000"
               max={currentYear}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder={`e.g. ${currentYear}`}
             />
           </div>
@@ -160,7 +205,7 @@ export default function AddPublication() {
               name="publisher"
               value={form.publisher}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="Publisher name"
             />
           </div>
@@ -170,7 +215,7 @@ export default function AddPublication() {
               name="department"
               value={form.department}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="">Select Department</option>
               {departments.map((d) => (
@@ -192,7 +237,7 @@ export default function AddPublication() {
               name="type"
               value={form.type}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="book">Book</option>
               <option value="thesis">Thesis</option>
@@ -206,7 +251,7 @@ export default function AddPublication() {
               name="shelf_location"
               value={form.shelf_location}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="e.g., A-15-3"
             />
           </div>
@@ -222,7 +267,7 @@ export default function AddPublication() {
               min="0"
               value={form.total_copies}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
           <div>
@@ -236,7 +281,7 @@ export default function AddPublication() {
               max={form.total_copies}
               value={form.available_copies}
               onChange={handleChange}
-              className="w-full border rounded px-3 py-2"
+              className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -249,7 +294,7 @@ export default function AddPublication() {
             value={form.description}
             onChange={handleChange}
             rows="4"
-            className="w-full border rounded px-3 py-2"
+            className="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Enter description or summary"
           />
         </div>
@@ -261,7 +306,7 @@ export default function AddPublication() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="mt-1"
+            className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
           />
           {previewUrl && (
             <div className="mt-3">
@@ -280,7 +325,7 @@ export default function AddPublication() {
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-indigo-600 text-white rounded"
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg transition-colors"
           >
             {loading ? "Uploading..." : "Add Publication"}
           </button>

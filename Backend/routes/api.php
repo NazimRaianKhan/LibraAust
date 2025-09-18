@@ -35,13 +35,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/my-borrows', [BorrowController::class, 'getUserBorrows']);
     
     // Librarian only routes
-    Route::middleware('role:librarian')->group(function () {
+    
         // Get all borrow records
         Route::get('/borrows', [BorrowController::class, 'getAllBorrows']);
         
         // Get borrowing statistics
         Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
-    });
+    
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Manual librarian actions for offline management
+    Route::post('/borrows/{id}/manual-return', [BorrowController::class, 'manualReturn']);
+    Route::post('/borrows/{id}/clear-fine', [BorrowController::class, 'clearFine']);
+    
+    // Optional: Extend due date feature
+    Route::post('/borrows/{id}/extend-due-date', [BorrowController::class, 'extendDueDate']);
 });
 
 
