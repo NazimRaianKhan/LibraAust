@@ -24,7 +24,7 @@ export default function BookEdit() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const departments = ["CSE", "EEE", "MPE", "Textile", "Arch", "Civil"];
+  const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
 
   useEffect(() => {
     axios

@@ -21,7 +21,7 @@ export default function AddPublication() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const departments = ["CSE", "EEE", "MPE", "Textile", "Arch", "Civil"];
+ const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
   const currentYear = new Date().getFullYear();
 
   function handleChange(e) {

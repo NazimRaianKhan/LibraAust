@@ -14,7 +14,7 @@ class ChatbotController extends Controller
 
     public function __construct()
     {
-        $this->geminiApiKey = config('services.gemini.key'); 
+        $this->geminiApiKey = "AIzaSyBCXZ_nPrwwfXqYS9VQUQC_zAWo39KeCL0";
     }
 
     public function chat(Request $request)
@@ -110,7 +110,7 @@ STRICT RULE: You can ONLY mention books that are provided in the 'Available book
 
 TOPICS YOU HANDLE:
 - Library hours: 8:00 AM to 6:00 PM
-- Book recommendations (books and thesis) for: CSE, EEE, MPE, Textile, Architecture, Civil
+- Book recommendations (books and thesis) for: CSE, EEE, BBA, ME, TE, CE, IPE, ARCH
 - Library location: AUST Campus, Tejgaon, Dhaka
 - Book locations and shelf information
 
@@ -129,11 +129,15 @@ NEVER suggest books not in the provided database.";
     {
         $keywords = [
             'book', 'books', 'recommend', 'thesis', 'research', 
-            'CSE', 'EEE', 'MPE', 'Textile', 'Architecture', 'Civil',
+            'CSE', 'EEE', 'BBA', 'ME', 'TE', 'CE', 'IPE', 'ARCH',
             'programming', 'algorithm', 'database', 'network',
             'circuit', 'electronics', 'power', 'signal',
-            'fabric', 'dyeing', 'manufacturing',
-            'construction', 'design', 'structural',
+            'business', 'management', 'accounting', 'finance',
+            'mechanical', 'engineering', 'thermodynamics',
+            'textile', 'fabric', 'dyeing', 'manufacturing',
+            'civil', 'construction', 'structural', 'concrete',
+            'industrial', 'production', 'quality',
+            'architecture', 'design', 'building', 'planning',
             'where is', 'location', 'shelf'
         ];
        
@@ -171,8 +175,8 @@ NEVER suggest books not in the provided database.";
                 }
             }
 
-            // Check for department
-            $departments = ['CSE', 'EEE', 'MPE', 'Textile', 'Arch', 'Civil'];
+            // Check for department first
+            $departments = ['CSE', 'EEE', 'BBA', 'ME', 'TE', 'CE', 'IPE', 'ARCH'];
             $foundDept = false;
             
             foreach ($departments as $dept) {
@@ -183,31 +187,39 @@ NEVER suggest books not in the provided database.";
                 }
             }
 
-            // Check for thesis specifically
+            // Check for thesis or book type - THIS IS THE KEY FIX
+            $isThesisRequest = false;
             if (stripos($message, 'thesis') !== false) {
                 $query->where('type', 'thesis');
+                $isThesisRequest = true;
             } elseif (stripos($message, 'book') !== false) {
                 $query->where('type', 'book');
             }
 
             // Check for specific interests
             $interests = [
-                'programming' => ['programming', 'java', 'code', 'coding'],
+                'programming' => ['programming', 'java', 'code', 'coding', 'python', 'javascript'],
                 'algorithm' => ['algorithm', 'data structure'],
                 'database' => ['database', 'sql'],
                 'network' => ['network', 'networking'],
                 'circuit' => ['circuit', 'electronics'],
                 'power' => ['power', 'electrical'],
                 'signal' => ['signal', 'processing'],
-                'fabric' => ['fabric', 'textile'],
-                'dyeing' => ['dyeing', 'printing'],
+                'business' => ['business', 'management', 'marketing'],
+                'accounting' => ['accounting', 'finance', 'economics'],
+                'administration' => ['administration', 'organization', 'leadership'],
+                'mechanical' => ['mechanical', 'machine', 'engine'],
+                'thermodynamics' => ['thermodynamics', 'thermal', 'heat'],
                 'manufacturing' => ['manufacturing', 'production'],
-                'construction' => ['construction', 'building'],
-                'design' => ['design', 'planning'],
-                'structural' => ['structural', 'analysis'],
-                'concrete' => ['concrete', 'material'],
-                'thermodynamics' => ['thermodynamics', 'thermal'],
-                'machine' => ['machine', 'mechanical']
+                'textile' => ['textile', 'fabric', 'fiber'],
+                'dyeing' => ['dyeing', 'printing', 'coloring'],
+                'civil' => ['civil', 'construction', 'structural'],
+                'concrete' => ['concrete', 'material', 'cement'],
+                'industrial' => ['industrial', 'process', 'system'],
+                'quality' => ['quality', 'control', 'assurance'],
+                'production' => ['production', 'efficiency', 'optimization'],
+                'architecture' => ['architecture', 'design', 'building'],
+                'planning' => ['planning', 'urban', 'interior']
             ];
 
             $hasSpecificInterest = false;
@@ -224,13 +236,24 @@ NEVER suggest books not in the provided database.";
                 }
             }
 
-            // If department mentioned but no specific interest, return empty (AI will ask)
+            // Modified logic for thesis and book requests
             if ($foundDept && !$hasSpecificInterest) {
-                $generalRequests = ['books', 'book', 'need', 'want', 'show', 'recommend', 'thesis'];
+                $generalRequests = ['books', 'book', 'need', 'want', 'show', 'recommend'];
+                $isGeneralRequest = false;
+                
                 foreach ($generalRequests as $general) {
                     if (stripos($message, $general) !== false) {
-                        return collect(); // Empty to trigger interest question
+                        $isGeneralRequest = true;
+                        break;
                     }
+                }
+                
+                // For thesis requests, don't return empty - show available thesis
+                if ($isThesisRequest) {
+                    // Show available thesis from the department
+                    return $query->where('available_copies', '>', 0)->limit(3)->get();
+                } elseif ($isGeneralRequest) {
+                    return collect(); // Empty to trigger interest question for books
                 }
             }
 
@@ -255,10 +278,6 @@ NEVER suggest books not in the provided database.";
                 $formatted .= " 📍 Location: {$book->shelf_location}";
             }
             
-            if ($book->description) {
-                $shortDesc = substr($book->description, 0, 60);
-                $formatted .= " - " . $shortDesc . "...";
-            }
             $formatted .= "\n";
         }
         return $formatted;

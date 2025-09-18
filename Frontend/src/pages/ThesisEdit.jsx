@@ -26,7 +26,7 @@ export default function ThesisEdit() {
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const departments = ["CSE", "EEE", "MPE", "Textile", "Arch", "Civil"];
+  const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
   const currentYear = new Date().getFullYear();
 
   useEffect(() => {
