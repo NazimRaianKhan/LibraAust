@@ -6,10 +6,8 @@ use App\Http\Controllers\Api\V1\LoginController as LoginControllerV1;
 use App\Http\Controllers\LoginController as LoginController;
 use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
-use App\Http\Controllers\RecommendedController as RecommendedController;
+
 use App\Http\Controllers\PublicationController;
-use App\Http\Controllers\LibrarianController as LibrarianController;
-use App\Http\Controllers\LibrarianCreatorController as LibrarianCreatorController;
 
 Route::get('/publications', [PublicationController::class, 'index']);
 Route::get('/publications/{id}', [PublicationController::class, 'show']);
@@ -92,11 +90,3 @@ Route::get('/studentinfo', function (Request $request) {
 // ->middleware('auth:sanctum', 'abilities:stuff')
 
 Route::post('/faculty', [FacultyController::class, 'store']);
-
-
-Route::get('/recommended', [RecommendedController::class, 'recommended'])->middleware('auth:sanctum');
-Route::get('/featured', [RecommendedController::class, 'featured']);
-
-
-Route::get('/librarians', [LibrarianController::class, 'show']);
-Route::post('/librarians', [LibrarianController::class, 'store']);
