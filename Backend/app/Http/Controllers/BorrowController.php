@@ -265,4 +265,171 @@ class BorrowController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * ----------------------------------------------------------------
+     * Manual return by librarian (offline return)
+     */
+    public function manualReturn(Request $request, $borrowId)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'librarian') {
+                return response()->json(['message' => 'Only librarians can perform manual returns'], 403);
+            }
+
+            return DB::transaction(function () use ($borrowId) {
+                // Find the borrow record
+                $borrow = Borrow::with(['publication'])
+                    ->where('id', $borrowId)
+                    ->whereIn('status', ['borrowed', 'overdue'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$borrow) {
+                    return response()->json(['message' => 'Borrow record not found or already returned'], 404);
+                }
+
+                // Calculate fine if overdue
+                $actualReturnDate = Carbon::now();
+                $fine = 0;
+
+                if ($actualReturnDate->gt($borrow->return_date) && $borrow->fine_rate > 0) {
+                    $overdueDays = $actualReturnDate->diffInDays($borrow->return_date);
+                    $fine = $overdueDays * $borrow->fine_rate;
+                }
+
+                // Update borrow record
+                $borrow->update([
+                    'actual_return_date' => $actualReturnDate->toDateString(),
+                    'total_fine' => $fine,
+                    'status' => 'returned'
+                ]);
+
+                // Update publication available copies
+                $borrow->publication->increment('available_copies');
+
+                // Update user borrowed_id to null (clear last borrowed item tracking)
+                if ($borrow->borrower) {
+                    if ($borrow->borrower->role === 'student') {
+                        Students::where('email', $borrow->borrower->email)->update(['borrowed_id' => null]);
+                    } elseif ($borrow->borrower->role === 'faculty') {
+                        Faculties::where('email', $borrow->borrower->email)->update(['borrowed_id' => null]);
+                    }
+                }
+
+                return response()->json([
+                    'message' => 'Book manually returned successfully',
+                    'fine' => $fine,
+                    'borrow' => $borrow->load(['publication', 'borrower'])
+                ], 200);
+            });
+
+        } catch (\Exception $e) {
+            \Log::error('Manual return failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to process manual return',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Clear fine (when payment received offline)
+     */
+    public function clearFine(Request $request, $borrowId)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'librarian') {
+                return response()->json(['message' => 'Only librarians can clear fines'], 403);
+            }
+
+            return DB::transaction(function () use ($borrowId) {
+                // Find the borrow record
+                $borrow = Borrow::where('id', $borrowId)
+                    ->where('total_fine', '>', 0)
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!borrow) {
+                    return response()->json(['message' => 'Borrow record not found or no fine to clear'], 404);
+                }
+
+                $previousFine = $borrow->total_fine;
+
+                // Clear the fine
+                $borrow->update([
+                    'total_fine' => 0
+                ]);
+
+                return response()->json([
+                    'message' => 'Fine cleared successfully',
+                    'previous_fine' => $previousFine,
+                    'borrow' => $borrow->load(['publication', 'borrower'])
+                ], 200);
+            });
+
+        } catch (\Exception $e) {
+            \Log::error('Clear fine failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to clear fine',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Extend due date (bonus feature for librarians)
+     */
+    public function extendDueDate(Request $request, $borrowId)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'librarian') {
+                return response()->json(['message' => 'Only librarians can extend due dates'], 403);
+            }
+
+            $request->validate([
+                'days' => 'required|integer|min:1|max:30'
+            ]);
+
+            return DB::transaction(function () use ($borrowId, $request) {
+                // Find the borrow record
+                $borrow = Borrow::where('id', $borrowId)
+                    ->whereIn('status', ['borrowed', 'overdue'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$borrow) {
+                    return response()->json(['message' => 'Borrow record not found or already returned'], 404);
+                }
+
+                $oldDueDate = $borrow->return_date;
+                $newDueDate = Carbon::parse($borrow->return_date)->addDays($request->days);
+
+                // Update due date and reset status to borrowed if it was overdue
+                $borrow->update([
+                    'return_date' => $newDueDate->toDateString(),
+                    'status' => 'borrowed',
+                    'total_fine' => 0 // Clear existing fine when extending
+                ]);
+
+                return response()->json([
+                    'message' => 'Due date extended successfully',
+                    'old_due_date' => $oldDueDate,
+                    'new_due_date' => $newDueDate->toDateString(),
+                    'extended_by' => $request->days . ' days',
+                    'borrow' => $borrow->load(['publication', 'borrower'])
+                ], 200);
+            });
+
+        } catch (\Exception $e) {
+            \Log::error('Extend due date failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to extend due date',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
