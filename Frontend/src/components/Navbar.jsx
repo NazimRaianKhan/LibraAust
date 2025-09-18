@@ -20,13 +20,17 @@ export default function Navbar() {
 
   const [resourcesOpen, setResourcesOpen] = useState(false);
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [librarianOpen, setLibrarianOpen] = useState(false);
   const [mobileResourcesOpen, setMobileResourcesOpen] = useState(false);
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false);
+  const [mobileLibrarianOpen, setMobileLibrarianOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate("/");
   };
+
+  const isLibrarian = isAuthenticated && user?.role === 'librarian';
 
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-200">
@@ -77,6 +81,43 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* Librarian dropdown - only show if user is librarian */}
+          {isLibrarian && (
+            <div
+              className="relative"
+              onMouseEnter={() => setLibrarianOpen(true)}
+              onMouseLeave={() => setLibrarianOpen(false)}
+            >
+              <button
+                type="button"
+                className="px-3 py-2 rounded-lg text-sm text-blue-700 hover:bg-blue-50 flex items-center gap-1 font-medium"
+                onClick={() => setLibrarianOpen((v) => !v)}
+              >
+                Librarian ▾
+              </button>
+              {librarianOpen && (
+                <div className="absolute left-0 top-full pt-2 z-50">
+                  <div className="w-48 bg-white rounded-md shadow-lg overflow-hidden border border-gray-100">
+                    <NavLink
+                      to="/add-publication"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setLibrarianOpen(false)}
+                    >
+                      Add Publication
+                    </NavLink>
+                    <NavLink
+                      to="/manage-borrows"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setLibrarianOpen(false)}
+                    >
+                      Manage Borrows
+                    </NavLink>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* About dropdown */}
           <div
             className="relative"
@@ -113,6 +154,11 @@ export default function Navbar() {
           </div>
 
           <NavItem to="/contact">Contact</NavItem>
+
+          {/* Show My Borrows for students/faculty */}
+          {isAuthenticated && user?.role !== 'librarian' && (
+            <NavItem to="/my-borrows">My Borrows</NavItem>
+          )}
         </nav>
 
         {/* Right side (login/profile) */}
@@ -138,6 +184,11 @@ export default function Navbar() {
                 <span className="font-medium">
                   {user?.name || user?.email || "Profile"}
                 </span>
+                {isLibrarian && (
+                  <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                    Librarian
+                  </span>
+                )}
               </button>
               <button
                 className="border border-gray-300 hover:bg-gray-50 px-4 py-2 rounded-lg transition duration-200"
@@ -185,6 +236,38 @@ export default function Navbar() {
             )}
           </div>
 
+          {/* Librarian collapsible - only show if user is librarian */}
+          {isLibrarian && (
+            <div className="flex flex-col">
+              <button
+                type="button"
+                className="text-left px-3 py-2 rounded-lg text-sm text-blue-700 hover:bg-blue-50 flex items-center justify-between font-medium"
+                onClick={() => setMobileLibrarianOpen((v) => !v)}
+              >
+                <span>Librarian</span>
+                <span>{mobileLibrarianOpen ? "▴" : "▾"}</span>
+              </button>
+              {mobileLibrarianOpen && (
+                <div className="ml-4 mt-1">
+                  <NavLink
+                    to="/add-publication"
+                    className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setMobileLibrarianOpen(false)}
+                  >
+                    Add Publication
+                  </NavLink>
+                  <NavLink
+                    to="/manage-borrows"
+                    className="block px-3 py-2 rounded-lg text-sm text-gray-700 hover:bg-gray-100"
+                    onClick={() => setMobileLibrarianOpen(false)}
+                  >
+                    Manage Borrows
+                  </NavLink>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* About collapsible */}
           <div className="flex flex-col">
             <button
@@ -216,6 +299,11 @@ export default function Navbar() {
           </div>
 
           <NavItem to="/contact">Contact</NavItem>
+
+          {/* Show My Borrows for students/faculty in mobile */}
+          {isAuthenticated && user?.role !== 'librarian' && (
+            <NavItem to="/my-borrows">My Borrows</NavItem>
+          )}
         </div>
       </div>
     </header>
