@@ -1,11 +1,15 @@
+// src/pages/BookEdit.jsx
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import cookies from "js-cookie";
+import { toast } from "react-hot-toast";
 
 export default function BookEdit() {
   const server = import.meta.env.VITE_API_URL;
   const { id } = useParams();
   const navigate = useNavigate();
+
   const [book, setBook] = useState(null);
   const [form, setForm] = useState({
     title: "",
@@ -21,11 +25,13 @@ export default function BookEdit() {
     description: "",
     cover_url: "",
   });
+
   const [coverFile, setCoverFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [loading, setLoading] = useState(false);
 
   const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
+  const currentYear = new Date().getFullYear();
 
   useEffect(() => {
     axios
@@ -61,41 +67,52 @@ export default function BookEdit() {
     const file = e.target.files[0];
     if (file) {
       setCoverFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // validation
+    if (Number(form.available_copies) > Number(form.total_copies)) {
+      toast.error("Available copies cannot exceed total copies");
+      return;
+    }
+    if (
+      form.publication_year &&
+      (form.publication_year < 1000 || form.publication_year > currentYear)
+    ) {
+      toast.error(`Publication year must be between 1000 and ${currentYear}`);
+      return;
+    }
+
     setLoading(true);
-
     try {
-      const formData = new FormData();
-
-      // Append all form fields
-      Object.keys(form).forEach((key) => {
-        if (form[key] !== null && form[key] !== undefined) {
-          formData.append(key, form[key]);
-        }
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) fd.append(k, v);
       });
+      if (coverFile) fd.append("cover", coverFile);
 
-      // Append cover file if selected
-      if (coverFile) {
-        formData.append("cover", coverFile);
-      }
+      const token = cookies.get("authToken");
 
-      await axios.post(`${server}/api/publications/${id}`, formData, {
+      await axios.post(`${server}/api/publications/${id}`, fd, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+          // no Content-Type here
         },
       });
 
-      alert("Book updated successfully!");
+      toast.success("Book updated successfully!");
       navigate(`/books/${id}`);
     } catch (err) {
       console.error(err);
-      alert("Failed to update book.");
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to update book.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
