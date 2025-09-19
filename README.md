@@ -15,7 +15,7 @@ To create a digital platform that:
 ## Collaborators
 
 Mohymin Zawad </br>
-[![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/0e52deff-b132-4fe5-8cc1-e5d73cd2960c.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/0e52deff-b132-4fe5-8cc1-e5d73cd2960c)
+[![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf)
 
 Md. Aribur Rahman Dhruvo </br>
 [![wakatime](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616.svg)](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616)
