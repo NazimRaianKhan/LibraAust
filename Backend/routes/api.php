@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\LoginController as LoginControllerV1;
 use App\Http\Controllers\LoginController as LoginController;
 use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
+use App\Http\Controllers\ProfileQueryController as ProfileQueryController;
 
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\LibrarianController as LibrarianController;
@@ -114,3 +115,9 @@ Route::get('/featured', [RecommendedController::class, 'featured']);
 
 Route::get('/librarian', [LibrarianController::class, 'librarians']);
 Route::post('/librarian', [LibrarianController::class, 'create']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [ProfileQueryController::class, 'show']);
+    Route::put('/me', [ProfileQueryController::class, 'update']);
+});
+
