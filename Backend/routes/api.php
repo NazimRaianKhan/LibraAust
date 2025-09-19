@@ -7,6 +7,9 @@ use App\Http\Controllers\LoginController as LoginController;
 use App\Http\Controllers\FacultyController as FacultyController;
 use App\Http\Controllers\Api\V1\UsersController as UsersController;
 use App\Http\Controllers\ProfileQueryController as ProfileQueryController;
+use App\Http\Controllers\RecommendedController as RecommendedController;
+use App\Http\Controllers\TestController as TestController;
+
 
 use App\Http\Controllers\PublicationController;
 use App\Http\Controllers\LibrarianController as LibrarianController;
@@ -25,31 +28,31 @@ Route::post('/chatbot', [ChatbotController::class, 'chat']);
 use App\Http\Controllers\BorrowController;
 
 Route::middleware('auth:sanctum')->group(function () {
-    
+
     // Borrow a publication
     Route::post('/publications/{id}/borrow', [BorrowController::class, 'borrowPublication']);
-    
+
     // Return a borrowed publication
     Route::post('/borrows/{id}/return', [BorrowController::class, 'returnPublication']);
-    
+
     // Get current user's borrowing history
     Route::get('/my-borrows', [BorrowController::class, 'getUserBorrows']);
-    
+
     // Librarian only routes
-    
-        // Get all borrow records
-        Route::get('/borrows', [BorrowController::class, 'getAllBorrows']);
-        
-        // Get borrowing statistics
-        Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
-    
+
+    // Get all borrow records
+    Route::get('/borrows', [BorrowController::class, 'getAllBorrows']);
+
+    // Get borrowing statistics
+    Route::get('/borrow-stats', [BorrowController::class, 'getBorrowingStats']);
+
 });
 
 Route::middleware('auth:sanctum')->group(function () {
     // Manual librarian actions for offline management
     Route::post('/borrows/{id}/manual-return', [BorrowController::class, 'manualReturn']);
     Route::post('/borrows/{id}/clear-fine', [BorrowController::class, 'clearFine']);
-    
+
     // Optional: Extend due date feature
     Route::post('/borrows/{id}/extend-due-date', [BorrowController::class, 'extendDueDate']);
 });
@@ -121,3 +124,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/me', [ProfileQueryController::class, 'update']);
 });
 
+Route::get('/test', TestController::class);
