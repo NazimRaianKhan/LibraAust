@@ -14,8 +14,11 @@ To create a digital platform that:
 
 ## Collaborators
 
-Md. Aribur Rahman Dhruvo
-wakatime.com/@ARDhruvo
+Mohymin Zawad </br>
+[![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/0e52deff-b132-4fe5-8cc1-e5d73cd2960c.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/0e52deff-b132-4fe5-8cc1-e5d73cd2960c)
+
+Md. Aribur Rahman Dhruvo </br>
+[![wakatime](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616.svg)](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616)
 
 Mohammad Yahya Bin Belal</br>
 [![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65)
@@ -67,4 +70,3 @@ Nazim Raian Khan</br>
 ## UI Design
 
 View our UI prototype on Figma: [LibraAust](https://www.figma.com/make/YtpOSa3FB7CS3hPW0d7SlH/LibraAust?fullscreen=1)
-
