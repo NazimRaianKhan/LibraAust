@@ -25,14 +25,12 @@ return [
         'http://localhost:5174', 
         'http://127.0.0.1:3000', 
         'http://127.0.0.1:5173',
-        'https://your-frontend-domain.netlify.app', // Add your frontend URL
-        'https://your-frontend-domain.vercel.app',  // Or whatever domain you use
+        'https://libra-aust.vercel.app/',  // Or whatever domain you use
     ],
 
     'allowed_origins_patterns' => [
         // You can also use patterns for dynamic subdomains
-        'https://*.netlify.app',
-        'https://*.vercel.app',
+        'https://libra-aust.vercel.app/',
     ],
 
     'allowed_headers' => ['*'],
