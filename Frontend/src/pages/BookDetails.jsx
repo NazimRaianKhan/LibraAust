@@ -81,7 +81,7 @@ export default function BookDetails() {
       );
 
       // Refresh book data to update available_copies
-      const refreshed = await axios.get(`${server}///api/publications/${id}`);
+      const refreshed = await axios.get(`${server}/api/publications/${id}`);
       setBook(refreshed.data);
     } catch (err) {
       console.error(err);
