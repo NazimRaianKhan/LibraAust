@@ -2,8 +2,10 @@ import axios from "axios";
 
 // Instance for apis that DONT needx /api prefix
 
+const server = import.meta.env.VITE_API_BASE_URL;
+
 const serv = axios.create({
-  baseURL: "http://localhost:8000", // Your Laravel backend
+  baseURL: `${server}`, // Your Laravel backend
   withCredentials: true, // Required for Sanctum cookies
 });
 

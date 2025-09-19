@@ -1,25 +1,26 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, MessageCircle, X, Bot, User } from 'lucide-react';
+import { useState, useRef, useEffect } from "react";
+import { Send, MessageCircle, X, Bot, User } from "lucide-react";
 
 export default function LibraryChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
+  const server = import.meta.env.VITE_API_BASE_URL;
 
   // Load messages from localStorage on component mount
   useEffect(() => {
-    const savedMessages = localStorage.getItem('aust-library-chat');
+    const savedMessages = localStorage.getItem("aust-library-chat");
     if (savedMessages) {
       try {
         const parsedMessages = JSON.parse(savedMessages);
         // Check if messages are from today (optional - removes old chats)
         const today = new Date().toDateString();
-        const hasRecentMessages = parsedMessages.some(msg => 
-          new Date(msg.timestamp).toDateString() === today
+        const hasRecentMessages = parsedMessages.some(
+          (msg) => new Date(msg.timestamp).toDateString() === today
         );
-        
+
         if (hasRecentMessages) {
           setMessages(parsedMessages);
         } else {
@@ -27,7 +28,7 @@ export default function LibraryChatbot() {
           setInitialMessage();
         }
       } catch (error) {
-        console.error('Error loading chat history:', error);
+        console.error("Error loading chat history:", error);
         setInitialMessage();
       }
     } else {
@@ -38,20 +39,23 @@ export default function LibraryChatbot() {
   // Save messages to localStorage whenever messages change
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem('aust-library-chat', JSON.stringify(messages));
+      localStorage.setItem("aust-library-chat", JSON.stringify(messages));
     }
   }, [messages]);
 
   const setInitialMessage = () => {
-    setMessages([{
-      type: 'bot',
-      content: "Hello! I'm your AUST Library assistant. I can help you with library information, book recommendations based on your department or interests, and academic resources. How can I assist you today?",
-      timestamp: new Date()
-    }]);
+    setMessages([
+      {
+        type: "bot",
+        content:
+          "Hello! I'm your AUST Library assistant. I can help you with library information, book recommendations based on your department or interests, and academic resources. How can I assist you today?",
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   const clearChatHistory = () => {
-    localStorage.removeItem('aust-library-chat');
+    localStorage.removeItem("aust-library-chat");
     setInitialMessage();
   };
 
@@ -68,45 +72,46 @@ export default function LibraryChatbot() {
     if (!inputMessage.trim() || isLoading) return;
 
     const userMessage = {
-      type: 'user',
+      type: "user",
       content: inputMessage.trim(),
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/chatbot', {
-        method: 'POST',
+      const response = await fetch(`${server}/api/chatbot`, {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          message: userMessage.content
-        })
+          message: userMessage.content,
+        }),
       });
 
       if (response.ok) {
         const data = await response.json();
         const botMessage = {
-          type: 'bot',
+          type: "bot",
           content: data.response,
-          timestamp: new Date()
+          timestamp: new Date(),
         };
-        setMessages(prev => [...prev, botMessage]);
+        setMessages((prev) => [...prev, botMessage]);
       } else {
-        throw new Error('API request failed');
+        throw new Error("API request failed");
       }
     } catch (error) {
-      console.error('Chatbot error:', error);
+      console.error("Chatbot error:", error);
       const errorMessage = {
-        type: 'bot',
-        content: "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
-        timestamp: new Date()
+        type: "bot",
+        content:
+          "I apologize, but I'm having trouble responding right now. Please try again in a moment.",
+        timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +122,7 @@ export default function LibraryChatbot() {
     "Can you recommend books for textile engineering?",
     "What are the library hours?",
     "Show me available thesis on computer science",
-    "I need books about programming"
+    "I need books about programming",
   ];
 
   const handleSuggestedQuestion = (question) => {
@@ -170,30 +175,49 @@ export default function LibraryChatbot() {
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+                className={`flex ${
+                  message.type === "user" ? "justify-end" : "justify-start"
+                }`}
               >
-                <div className={`flex items-start gap-2 max-w-[80%] ${
-                  message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    message.type === 'user' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {message.type === 'user' ? <User size={16} /> : <Bot size={16} />}
+                <div
+                  className={`flex items-start gap-2 max-w-[80%] ${
+                    message.type === "user" ? "flex-row-reverse" : "flex-row"
+                  }`}
+                >
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                      message.type === "user"
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-200 text-gray-600"
+                    }`}
+                  >
+                    {message.type === "user" ? (
+                      <User size={16} />
+                    ) : (
+                      <Bot size={16} />
+                    )}
                   </div>
-                  <div className={`p-3 rounded-lg ${
-                    message.type === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-sm'
-                      : 'bg-gray-100 text-gray-800 rounded-bl-sm'
-                  }`}>
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <div
+                    className={`p-3 rounded-lg ${
+                      message.type === "user"
+                        ? "bg-blue-600 text-white rounded-br-sm"
+                        : "bg-gray-100 text-gray-800 rounded-bl-sm"
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content}
+                    </p>
                     <p className={`text-xs mt-1 opacity-70`}>
-                      {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(message.timestamp).toLocaleTimeString([], {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </p>
                   </div>
                 </div>
               </div>
             ))}
-            
+
             {isLoading && (
               <div className="flex justify-start">
                 <div className="flex items-center gap-2">
@@ -203,14 +227,20 @@ export default function LibraryChatbot() {
                   <div className="bg-gray-100 p-3 rounded-lg">
                     <div className="flex space-x-1">
                       <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.1s" }}
+                      ></div>
+                      <div
+                        className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                        style={{ animationDelay: "0.2s" }}
+                      ></div>
                     </div>
                   </div>
                 </div>
               </div>
             )}
-            
+
             <div ref={messagesEndRef} />
           </div>
 
@@ -243,7 +273,7 @@ export default function LibraryChatbot() {
                 className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 disabled={isLoading}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
+                  if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
                     sendMessage(e);
                   }

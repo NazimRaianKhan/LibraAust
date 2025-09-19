@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function ThesisEdit() {
+  const server = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -31,7 +32,7 @@ export default function ThesisEdit() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/publications/${id}`)
+      .get(`${server}/api/publications/${id}`)
       .then((res) => {
         setThesis(res.data);
         setForm(res.data);
@@ -113,7 +114,7 @@ export default function ThesisEdit() {
         formData.append("cover", coverFile);
       }
 
-      await axios.post(`http://localhost:8000/api/publications/${id}`, formData, {
+      await axios.post(`${server}/api/publications/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -181,7 +182,9 @@ export default function ThesisEdit() {
 
         {/* Title */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Title</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Title
+          </label>
           <input
             type="text"
             name="title"
@@ -194,7 +197,9 @@ export default function ThesisEdit() {
 
         {/* Author */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Author</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Author
+          </label>
           <input
             type="text"
             name="author"
@@ -207,7 +212,9 @@ export default function ThesisEdit() {
 
         {/* Department */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Department</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Department
+          </label>
           <select
             name="department"
             value={form.department || ""}
@@ -225,7 +232,9 @@ export default function ThesisEdit() {
 
         {/* Publisher */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Publisher</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Publisher
+          </label>
           <input
             type="text"
             name="publisher"

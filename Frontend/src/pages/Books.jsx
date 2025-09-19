@@ -1,35 +1,40 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
-import SearchBar from '../components/SearchBar.jsx'
-import Filters from '../components/Filters.jsx'
-import Pagination from '../components/Pagination.jsx'
-import PublicationCard from '../components/PublicationCard.jsx'
-import axios from 'axios'
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import SearchBar from "../components/SearchBar.jsx";
+import Filters from "../components/Filters.jsx";
+import Pagination from "../components/Pagination.jsx";
+import PublicationCard from "../components/PublicationCard.jsx";
+import axios from "axios";
 
 export default function Books() {
-  const [books, setBooks] = useState([])
-  const [query, setQuery] = useState('')
-  const [dept, setDept] = useState('')
-  const [page, setPage] = useState(1)
-  const pageSize = 12
+  const server = import.meta.env.VITE_API_BASE_URL;
+  const [books, setBooks] = useState([]);
+  const [query, setQuery] = useState("");
+  const [dept, setDept] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 12;
 
   useEffect(() => {
-    axios.get('http://localhost:8000/api/publications?type=book')
-      .then(res => setBooks(res.data))
-      .catch(err => console.error(err))
-  }, [])
+    axios
+      .get(`${server}/api/publications?type=book`)
+      .then((res) => setBooks(res.data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const filtered = useMemo(() => {
-    return books.filter(b =>
-      (!dept || b.department === dept) &&
-      (!query || b.title.toLowerCase().includes(query.toLowerCase()))
-    )
-  }, [books, query, dept])
+    return books.filter(
+      (b) =>
+        (!dept || b.department === dept) &&
+        (!query || b.title.toLowerCase().includes(query.toLowerCase()))
+    );
+  }, [books, query, dept]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize))
-  const pageItems = filtered.slice((page - 1) * pageSize, page * pageSize)
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const pageItems = filtered.slice((page - 1) * pageSize, page * pageSize);
 
-  useEffect(() => { setPage(1) }, [query, dept])
+  useEffect(() => {
+    setPage(1);
+  }, [query, dept]);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 text-center">
@@ -37,16 +42,20 @@ export default function Books() {
 
       {/* Search + Filters */}
       <div className="flex flex-col md:flex-row items-center justify-center gap-4 bg-white shadow-md rounded-xl p-4 mb-10">
-        <SearchBar value={query} onChange={setQuery} placeholder="Search books..." />
+        <SearchBar
+          value={query}
+          onChange={setQuery}
+          placeholder="Search books..."
+        />
         <Filters department={dept} onDepartmentChange={setDept} />
       </div>
 
       {/* Books Grid */}
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
-        {pageItems.map(b => (
-          <Link 
-            key={b.id} 
-            to={`/books/${b.id}`} 
+        {pageItems.map((b) => (
+          <Link
+            key={b.id}
+            to={`/books/${b.id}`}
             className="block w-full hover:scale-[1.02] transition"
           >
             <PublicationCard item={b} />
@@ -55,8 +64,12 @@ export default function Books() {
       </div>
 
       <div className="mt-8">
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       </div>
     </div>
-  )
+  );
 }

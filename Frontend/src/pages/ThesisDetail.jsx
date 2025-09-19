@@ -1,11 +1,12 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useAuth } from "../state/AuthContext";  // Adjust path as needed
+import { useAuth } from "../state/AuthContext"; // Adjust path as needed
 import { toast } from "react-hot-toast";
 import cookies from "js-cookie";
 
 export default function ThesisDetail() {
+  const server = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
@@ -14,16 +15,17 @@ export default function ThesisDetail() {
 
   useEffect(() => {
     // Fetch thesis details
-    axios.get(`http://localhost:8000/api/publications/${id}`)
-      .then(res => setThesis(res.data))
-      .catch(err => {
+    axios
+      .get(`${server}/api/publications/${id}`)
+      .then((res) => setThesis(res.data))
+      .catch((err) => {
         console.error(err);
         toast.error("Failed to load thesis details");
       });
   }, [id]);
 
   const handleDelete = async () => {
-    if (!user || user.role !== 'librarian') {
+    if (!user || user.role !== "librarian") {
       toast.error("Only librarians can delete thesis");
       return;
     }
@@ -31,14 +33,17 @@ export default function ThesisDetail() {
     if (window.confirm("Are you sure you want to delete this thesis?")) {
       try {
         const token = cookies.get("authToken");
-        await axios.delete(`http://localhost:8000/api/publications/${id}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        await axios.delete(`${server}/api/publications/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
         toast.success("Thesis deleted successfully");
         navigate("/resources/thesis");
       } catch (err) {
         console.error(err);
-        toast.error("Failed to delete thesis: " + (err.response?.data?.message || err.message));
+        toast.error(
+          "Failed to delete thesis: " +
+            (err.response?.data?.message || err.message)
+        );
       }
     }
   };
@@ -49,7 +54,7 @@ export default function ThesisDetail() {
       return;
     }
 
-    if (!user || user.role === 'librarian') {
+    if (!user || user.role === "librarian") {
       toast.error("Only students and faculty can borrow thesis");
       return;
     }
@@ -63,22 +68,25 @@ export default function ThesisDetail() {
     try {
       const token = cookies.get("authToken");
       const res = await axios.post(
-        `http://localhost:8000/api/publications/${id}/borrow`,
+        `${server}/api/publications/${id}/borrow`,
         {},
         {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       const returnDate = new Date(res.data.return_date).toLocaleDateString();
-      toast.success(`Thesis borrowed successfully! Please return by: ${returnDate}`);
-      
+      toast.success(
+        `Thesis borrowed successfully! Please return by: ${returnDate}`
+      );
+
       // Refresh thesis data to update available_copies
-      const refreshed = await axios.get(`http://localhost:8000/api/publications/${id}`);
+      const refreshed = await axios.get(`${server}/api/publications/${id}`);
       setThesis(refreshed.data);
     } catch (err) {
       console.error(err);
-      const errorMessage = err.response?.data?.message || "Failed to borrow thesis";
+      const errorMessage =
+        err.response?.data?.message || "Failed to borrow thesis";
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -89,8 +97,9 @@ export default function ThesisDetail() {
     return <p className="text-center mt-20 text-gray-600">Loading...</p>;
   }
 
-  const canBorrow = isAuthenticated && user && ['student', 'faculty'].includes(user.role);
-  const canManage = isAuthenticated && user && user.role === 'librarian';
+  const canBorrow =
+    isAuthenticated && user && ["student", "faculty"].includes(user.role);
+  const canManage = isAuthenticated && user && user.role === "librarian";
 
   return (
     <div className="flex flex-col items-center py-12 px-4">
@@ -131,22 +140,44 @@ export default function ThesisDetail() {
 
         <div className="p-8 flex flex-col">
           <h1 className="text-3xl font-bold mb-4">{thesis.title}</h1>
-          <p className="text-lg text-gray-700 mb-2"><b>Author:</b> {thesis.author}</p>
-          <p className="text-gray-600 mb-2"><b>Department:</b> {thesis.department || 'N/A'}</p>
-          <p className="text-gray-600 mb-2"><b>Publisher:</b> {thesis.publisher || 'N/A'}</p>
-          <p className="text-gray-600 mb-2"><b>Year:</b> {thesis.publication_year || 'N/A'}</p>
-          <p className="text-gray-600 mb-2"><b>Type:</b> {thesis.type}</p>
-          <p className="text-gray-600 mb-2"><b>Shelf:</b> {thesis.shelf_location || 'N/A'}</p>
-          <p className="text-gray-600 mb-2"><b>Total Copies:</b> {thesis.total_copies}</p>
+          <p className="text-lg text-gray-700 mb-2">
+            <b>Author:</b> {thesis.author}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Department:</b> {thesis.department || "N/A"}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Publisher:</b> {thesis.publisher || "N/A"}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Year:</b> {thesis.publication_year || "N/A"}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Type:</b> {thesis.type}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Shelf:</b> {thesis.shelf_location || "N/A"}
+          </p>
+          <p className="text-gray-600 mb-2">
+            <b>Total Copies:</b> {thesis.total_copies}
+          </p>
           <p className="text-gray-600 mb-4">
-            <b>Available Copies:</b> 
-            <span className={thesis.available_copies > 0 ? "text-green-600 font-semibold ml-2" : "text-red-600 font-semibold ml-2"}>
+            <b>Available Copies:</b>
+            <span
+              className={
+                thesis.available_copies > 0
+                  ? "text-green-600 font-semibold ml-2"
+                  : "text-red-600 font-semibold ml-2"
+              }
+            >
               {thesis.available_copies}
             </span>
           </p>
-          
+
           {thesis.description && (
-            <p className="mt-6 text-gray-700 leading-relaxed">{thesis.description}</p>
+            <p className="mt-6 text-gray-700 leading-relaxed">
+              {thesis.description}
+            </p>
           )}
 
           {/* Borrow Button - only show to students and faculty */}
@@ -155,16 +186,17 @@ export default function ThesisDetail() {
               onClick={handleBorrow}
               disabled={thesis.available_copies <= 0 || loading}
               className={`mt-6 px-5 py-2 rounded-xl text-white shadow transition-colors
-                ${thesis.available_copies > 0 && !loading 
-                  ? "bg-green-600 hover:bg-green-700" 
-                  : "bg-gray-400 cursor-not-allowed"}`}
+                ${
+                  thesis.available_copies > 0 && !loading
+                    ? "bg-green-600 hover:bg-green-700"
+                    : "bg-gray-400 cursor-not-allowed"
+                }`}
             >
-              {loading 
-                ? "Processing..." 
-                : thesis.available_copies > 0 
-                  ? "Borrow Thesis" 
-                  : "Not Available"
-              }
+              {loading
+                ? "Processing..."
+                : thesis.available_copies > 0
+                ? "Borrow Thesis"
+                : "Not Available"}
             </button>
           )}
 
@@ -178,8 +210,8 @@ export default function ThesisDetail() {
           {!isAuthenticated && (
             <div className="mt-6 p-3 bg-blue-100 border border-blue-400 text-blue-700 rounded-xl">
               <p className="mb-2">Please log in to borrow thesis.</p>
-              <Link 
-                to="/Signin" 
+              <Link
+                to="/Signin"
                 className="text-blue-600 hover:text-blue-800 font-medium underline"
               >
                 Login here

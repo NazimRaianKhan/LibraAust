@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function BookEdit() {
+  const server = import.meta.env.VITE_API_BASE_URL;
   const { id } = useParams();
   const navigate = useNavigate();
   const [book, setBook] = useState(null);
@@ -28,7 +29,7 @@ export default function BookEdit() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:8000/api/publications/${id}`)
+      .get(`${server}/api/publications/${id}`)
       .then((res) => {
         setBook(res.data);
         setForm(res.data);
@@ -84,7 +85,7 @@ export default function BookEdit() {
         formData.append("cover", coverFile);
       }
 
-      await axios.post(`http://localhost:8000/api/publications/${id}`, formData, {
+      await axios.post(`${server}/api/publications/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
@@ -152,7 +153,9 @@ export default function BookEdit() {
 
         {/* Title */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Title</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Title
+          </label>
           <input
             type="text"
             name="title"
@@ -165,7 +168,9 @@ export default function BookEdit() {
 
         {/* Author */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Author</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Author
+          </label>
           <input
             type="text"
             name="author"
@@ -206,7 +211,9 @@ export default function BookEdit() {
 
         {/* Publisher */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Publisher</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Publisher
+          </label>
           <input
             type="text"
             name="publisher"
@@ -218,7 +225,9 @@ export default function BookEdit() {
 
         {/* Department */}
         <div>
-          <label className="block text-gray-700 font-semibold mb-1">Department</label>
+          <label className="block text-gray-700 font-semibold mb-1">
+            Department
+          </label>
           <select
             name="department"
             value={form.department || ""}

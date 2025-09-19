@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast"; // Add this import
 import cookies from "js-cookie"; // Add this import
 
 export default function AddPublication() {
+  const server = import.meta.env.VITE_API_BASE_URL;
   const { user, isAuthenticated } = useAuth(); // Add this
   const [form, setForm] = useState({
     title: "",
@@ -25,7 +26,7 @@ export default function AddPublication() {
   const [previewUrl, setPreviewUrl] = useState(null);
   const [loading, setLoading] = useState(false);
 
- const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
+  const departments = ["CSE", "EEE", "BBA", "ME", "TE", "CE", "IPE", "ARCH"];
   const currentYear = new Date().getFullYear();
 
   function handleChange(e) {
@@ -48,7 +49,7 @@ export default function AddPublication() {
     e.preventDefault();
 
     // Check if user is librarian
-    if (!isAuthenticated || user?.role !== 'librarian') {
+    if (!isAuthenticated || user?.role !== "librarian") {
       toast.error("Only librarians can add publications");
       return;
     }
@@ -59,7 +60,10 @@ export default function AddPublication() {
       return;
     }
 
-    if (form.publication_year && (form.publication_year < 1000 || form.publication_year > currentYear)) {
+    if (
+      form.publication_year &&
+      (form.publication_year < 1000 || form.publication_year > currentYear)
+    ) {
       toast.error(`Publication year must be between 1000 and ${currentYear}`);
       return;
     }
@@ -73,9 +77,9 @@ export default function AddPublication() {
       const token = cookies.get("authToken");
 
       // DON'T set Content-Type header manually - let browser set it
-      await axios.post("http://localhost:8000/api/publications", fd, {
-        headers: { 
-          Authorization: `Bearer ${token}`
+      await axios.post(`${server}/api/publications`, fd, {
+        headers: {
+          Authorization: `Bearer ${token}`,
           // Remove the Content-Type header - browser will set it automatically with boundary
         },
       });
@@ -99,9 +103,12 @@ export default function AddPublication() {
       setPreviewUrl(null);
     } catch (err) {
       console.error(err);
-      const errorMessage = err.response?.data?.message || err.response?.data?.error || "Failed to add publication";
+      const errorMessage =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to add publication";
       toast.error(errorMessage);
-      
+
       // Log detailed error for debugging
       if (err.response?.data?.errors) {
         console.error("Validation errors:", err.response.data.errors);
@@ -116,19 +123,27 @@ export default function AddPublication() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">Please log in to add publications.</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            Authentication Required
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Please log in to add publications.
+          </p>
         </div>
       </div>
     );
   }
 
-  if (user?.role !== 'librarian') {
+  if (user?.role !== "librarian") {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-red-600 mb-4">Access Denied</h2>
-          <p className="text-gray-600 mb-6">Only librarians can add publications.</p>
+          <h2 className="text-2xl font-bold text-red-600 mb-4">
+            Access Denied
+          </h2>
+          <p className="text-gray-600 mb-6">
+            Only librarians can add publications.
+          </p>
         </div>
       </div>
     );
@@ -260,7 +275,9 @@ export default function AddPublication() {
         {/* Copies */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block text-sm font-medium mb-1">Total Copies</label>
+            <label className="block text-sm font-medium mb-1">
+              Total Copies
+            </label>
             <input
               name="total_copies"
               type="number"
