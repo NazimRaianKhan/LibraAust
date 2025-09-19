@@ -25,12 +25,12 @@ return [
         'http://localhost:5174', 
         'http://127.0.0.1:3000', 
         'http://127.0.0.1:5173',
-        'https://libra-aust.vercel.app/',  // Or whatever domain you use
+        'https://libra-aust.vercel.app',  // Or whatever domain you use
     ],
 
     'allowed_origins_patterns' => [
         // You can also use patterns for dynamic subdomains
-        'https://libra-aust.vercel.app/',
+        'https://libra-aust.vercel.app',
     ],
 
     'allowed_headers' => ['*'],
