@@ -4,7 +4,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 
 export default function ThesisEdit() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const { id } = useParams();
   const navigate = useNavigate();
 

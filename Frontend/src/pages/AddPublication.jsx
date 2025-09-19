@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast"; // Add this import
 import cookies from "js-cookie"; // Add this import
 
 export default function AddPublication() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const { user, isAuthenticated } = useAuth(); // Add this
   const [form, setForm] = useState({
     title: "",

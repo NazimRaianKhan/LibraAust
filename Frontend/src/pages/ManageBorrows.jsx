@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import cookies from "js-cookie";
 
 export default function ManageBorrows() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [borrows, setBorrows] = useState([]);
   const [stats, setStats] = useState({});

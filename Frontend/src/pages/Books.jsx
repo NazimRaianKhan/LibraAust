@@ -7,7 +7,7 @@ import PublicationCard from "../components/PublicationCard.jsx";
 import axios from "axios";
 
 export default function Books() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const [books, setBooks] = useState([]);
   const [query, setQuery] = useState("");
   const [dept, setDept] = useState("");

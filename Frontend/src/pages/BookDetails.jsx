@@ -6,7 +6,7 @@ import { toast } from "react-hot-toast";
 import cookies from "js-cookie";
 
 export default function BookDetails() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const { id } = useParams();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();

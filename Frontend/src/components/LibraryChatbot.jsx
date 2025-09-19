@@ -7,7 +7,7 @@ export default function LibraryChatbot() {
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
 
   // Load messages from localStorage on component mount
   useEffect(() => {

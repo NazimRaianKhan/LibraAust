@@ -7,7 +7,7 @@ import Pagination from "../components/Pagination.jsx";
 import PublicationCard from "../components/PublicationCard.jsx";
 
 export default function Thesis() {
-  const server = import.meta.env.VITE_API_BASE_URL;
+  const server = import.meta.env.VITE_API_URL;
   const [theses, setTheses] = useState([]); // always an array → no filter error
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
