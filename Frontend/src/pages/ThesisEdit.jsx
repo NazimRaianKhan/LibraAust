@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "axios";
+import cookies from "js-cookie";
+import { toast } from "react-hot-toast";
 
 export default function ThesisEdit() {
   const server = import.meta.env.VITE_API_URL;
@@ -64,67 +66,60 @@ export default function ThesisEdit() {
     const file = e.target.files[0];
     if (file) {
       setCoverFile(file);
-      const url = URL.createObjectURL(file);
-      setPreviewUrl(url);
+      setPreviewUrl(URL.createObjectURL(file));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // validations
+    if (!form.title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+    if (!form.author.trim()) {
+      toast.error("Author is required");
+      return;
+    }
+    if (Number(form.available_copies) > Number(form.total_copies)) {
+      toast.error("Available copies cannot exceed total copies");
+      return;
+    }
+    if (
+      form.publication_year &&
+      (form.publication_year < 1000 || form.publication_year > currentYear)
+    ) {
+      toast.error(`Publication year must be between 1000 and ${currentYear}`);
+      return;
+    }
+
     setLoading(true);
-
     try {
-      // Basic validations
-      if (!form.title.trim()) {
-        alert("Title is required");
-        setLoading(false);
-        return;
-      }
-      if (!form.author.trim()) {
-        alert("Author is required");
-        setLoading(false);
-        return;
-      }
-      if (Number(form.available_copies) > Number(form.total_copies)) {
-        alert("Available copies cannot exceed total copies");
-        setLoading(false);
-        return;
-      }
-      if (
-        form.publication_year &&
-        (form.publication_year < 1000 || form.publication_year > currentYear)
-      ) {
-        alert(`Publication year must be between 1000 and ${currentYear}`);
-        setLoading(false);
-        return;
-      }
-
-      const formData = new FormData();
-
-      Object.keys(form).forEach((key) => {
-        if (form[key] !== null && form[key] !== undefined) {
-          formData.append(key, form[key]);
-        }
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => {
+        if (v !== null && v !== undefined) fd.append(k, v);
       });
+      fd.set("type", "thesis"); // enforce thesis type
+      if (coverFile) fd.append("cover", coverFile);
 
-      // Ensure type stays thesis
-      formData.set("type", "thesis");
+      const token = cookies.get("authToken");
 
-      if (coverFile) {
-        formData.append("cover", coverFile);
-      }
-
-      await axios.post(`${server}/api/publications/${id}`, formData, {
+      await axios.post(`${server}/api/publications/${id}`, fd, {
         headers: {
-          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      alert("Thesis updated successfully!");
+      toast.success("Thesis updated successfully!");
       navigate(`/thesis/${id}`);
     } catch (err) {
       console.error(err);
-      alert("Failed to update thesis.");
+      const msg =
+        err.response?.data?.message ||
+        err.response?.data?.error ||
+        "Failed to update thesis.";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
