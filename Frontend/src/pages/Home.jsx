@@ -63,7 +63,7 @@ const Announcements = () => (
         <div>
       <h3 className="font-semibold mb-3">Quick Actions</h3>
       <div className="space-y-3">
-        <Link className="card p-4 block" to="/resources">Search Resources</Link>
+        <Link className="card p-4 block" to="/resources/books">Search Resources</Link>
         <Link className="card p-4 block" to="/about/rules">Library Rules</Link>
         <Link className="card p-4 block" to="/contact">Contact Librarian</Link>
       </div>

@@ -17,7 +17,7 @@ export default function Hero() {
         {/* Buttons */}
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
-            to="/resources"
+            to="/resources/books"
             className="px-6 py-3 rounded-lg font-semibold bg-white text-gray-900 hover:bg-gray-100 transition"
           >
             Browse Books

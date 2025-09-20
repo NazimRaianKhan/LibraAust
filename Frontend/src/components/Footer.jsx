@@ -13,7 +13,7 @@ export default function Footer() {
           <h4 className="font-semibold mb-2">Quick Links</h4>
           <ul className="space-y-2 text-sm">
             <li><a className="link" href="/">Home</a></li>
-            <li><a className="link" href="/resources">Resources</a></li>
+            <li><a className="link" href="/resources/books">Resources</a></li>
             <li><a className="link" href="/about/kfr">About</a></li>
             <li><a className="link" href="/contact">Contact</a></li>
           </ul>
