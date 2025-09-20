@@ -54,11 +54,11 @@ const Featured = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-        // console.log("Recommended books:", response.data);
-        console.log(response.data);
+
+        // Convert the response data object to an array
         const booksArray = Object.values(response.data);
 
-        // Now you can use slice
+        // Now we can slice
         setFeatured(booksArray.slice(0, 5));
         // setFeatured(response.data.slice(0, 5));
       } catch (error) {
