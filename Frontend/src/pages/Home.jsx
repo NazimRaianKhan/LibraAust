@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import api from "../services/api.js";
 import { useAuth } from "../state/AuthContext";
 import cookies from "js-cookie";
+import LibraryChatbot from "../components/LibraryChatbot.jsx";
 
 const Stats = () => (
   <section className="container mx-auto px-6 -mt-10">
@@ -136,6 +137,8 @@ export default function Home() {
       <Featured />
 
       <Announcements />
+
+      <LibraryChatbot />
     </div>
   );
 }
