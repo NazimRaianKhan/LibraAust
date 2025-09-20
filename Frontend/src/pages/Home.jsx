@@ -55,7 +55,12 @@ const Featured = () => {
           },
         });
         // console.log("Recommended books:", response.data);
-        setFeatured(response.data.slice(0, 5));
+        console.log(response.data);
+        const booksArray = Object.values(response.data);
+
+        // Now you can use slice
+        setFeatured(booksArray.slice(0, 5));
+        // setFeatured(response.data.slice(0, 5));
       } catch (error) {
         console.error("Failed to fetch recommended books:", error);
         setFeatured(sampleBooks.slice(0, 5));
