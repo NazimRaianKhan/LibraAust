@@ -1,6 +1,6 @@
 # LibraAust - University Library Management System
 
-**Team Members:**  
+**Team Members:**
 
 - Md. Aribur Rahman Dhruvo | aribur.cse.20220204003@aust.edu
 - Mohammad Yahya Bin Belal | yahya.cse.20220204004@aust.edu
@@ -8,7 +8,7 @@
 - Mohymin Zawad | mohymin.cse.20210204061@aust.edu
 
 **Project Live Link:** [libra-aust.vercel.app](https://libra-aust.vercel.app/) </br>
-**Recorded video:** 
+**Recorded video:**
 
 ---
 
@@ -20,8 +20,8 @@
 4. [Technologies Used](#4-technologies-used)
 5. [System Architecture](#5-system-architecture)
 6. [Setup Guidelines](#6-setup-guidelines)
-    - [Backend](#backend)
-    - [Frontend](#frontend)
+   - [Backend](#backend)
+   - [Frontend](#frontend)
 7. [Running the Application](#7-running-the-application)
 8. [Deployment Status & Tests](#8-deployment-status--tests)
 9. [Contribution Table](#9-contribution-table)
@@ -44,7 +44,7 @@ The obejective is to create a digital platform that:
 
 ## 2. Workflow Overview
 
-*High-level workflow of your project (can include a diagram).*
+![Workflow](Images/Workflow.png)
 
 ---
 
@@ -63,23 +63,21 @@ The obejective is to create a digital platform that:
 
 ## 4. Technologies Used
 
-- Frontend: React, Tailwind CSS, 
-- Backend: Laravel, Sanctum  
-- Database: MySQL 
-- APIs: Cloudinary, Gemini, Restful API 
-- Other Tools: Docker, Vercel(Frontend), Railway(Database), Render(Backend)  
+- Frontend: React, Tailwind CSS,
+- Backend: Laravel, Sanctum
+- Database: MySQL
+- APIs: Cloudinary, Gemini, Restful API
+- Other Tools: Docker, Vercel(Frontend), Railway(Database), Render(Backend)
 
 ---
 
 ## 5. System Architecture
 
-*Provide a diagram or description of frontend, backend, database, and API interactions.*
-
----
+## ![SystemArchitecture](Images/SysArchi.png)
 
 ## 6. Setup Guidelines
 
-### Backend  
+### Backend
 
 ```bash
 # Clone the repository
@@ -139,21 +137,17 @@ npm run dev
 ## 8. Deployment Status & Tests
 
 | Component | Is Deployed? | Is Dockerized? | Unit Tests Added? (Optional) | Is AI feature implemented? (Optional) |
-|-----------|--------------|----------------|-------------------|--------------------------|
-| Backend   |    Yes       |         Yes    |  No              | Yes                     |
-| Frontend  |    Yes       |         No    |  No               | No                      |
-
-
+| --------- | ------------ | -------------- | ---------------------------- | ------------------------------------- |
+| Backend   | Yes          | Yes            | No                           | Yes                                   |
+| Frontend  | Yes          | No             | No                           | No                                    |
 
 ## 9. Contribution Table
 
-| Metric                      | Total | Backend | Frontend | Member 1 | Member 2 | Member 3 | Member 4 |
-|-----------------------------|-------|---------|----------|----------|----------|----------|----------|
-| Issues Solved                |   27     |    12     |    15      |     8     |   2       |     16     |     1     |
-| WakaTime Contribution (Hours)|       |         |          | [![wakatime](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616.svg)](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616)         | [![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65)         |   [![wakatime](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece.svg)](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece) |    [![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf)   |
-| Percent Contribution (%)     | 100      |         |          |     29     |    8    |      59    |    4      |
-
-*Note: Replace the placeholders with actual data. In case of keeping the backend and frontend in a single repository, you can divide the backend and frontend contributions based on number of commits. In case of wakaTime just divide the total hours equally to frontend and backend for a team member.*
+| Metric                        | Total | Backend | Frontend | Member 1                                                                                                                                                                                                                                                | Member 2                                                                                                                                                                                                                                                | Member 3                                                                                                                                                                                                                                                | Member 4                                                                                                                                                                                                                                                |
+| ----------------------------- | ----- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Issues Solved                 | 27    | 12      | 15       | 8                                                                                                                                                                                                                                                       | 2                                                                                                                                                                                                                                                       | 16                                                                                                                                                                                                                                                      | 1                                                                                                                                                                                                                                                       |
+| WakaTime Contribution (Hours) |       |         |          | [![wakatime](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616.svg)](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616) | [![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65) | [![wakatime](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece.svg)](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece) | [![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf) |
+| Percent Contribution (%)      | 100   |         |          | 29                                                                                                                                                                                                                                                      | 8                                                                                                                                                                                                                                                       | 59                                                                                                                                                                                                                                                      | 4                                                                                                                                                                                                                                                       |
 
 ## 10. Screenshots
 
@@ -214,7 +208,6 @@ npm run dev
 - No option for account recovery
 - No option for email verification or reset password
 - chatbot sometimes dont work properly and only recommend based on department
-
 
 ## 12. UI Design
 
