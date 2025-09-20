@@ -1,5 +1,8 @@
 // src/pages/ProfilePage.jsx
 import { useEffect, useState } from "react";
+import api from "../services/api";
+import cookies from "js-cookie";
+import { useAuth } from "../state/AuthContext";
 
 const DEFAULT_USER = {
   name: "John Doe",
@@ -14,25 +17,57 @@ const DEFAULT_USER = {
     enrollmentDate: "February 1, 2021",
   },
   borrowed: [
-    { title: "Introduction to Algorithms", author: "Thomas H. Cormen", borrowed: "1/15/2025", due: "1/29/2025", overdueDays: 205, renewed: "0/1" },
-    { title: "Computer Networks", author: "Andrew S. Tanenbaum", borrowed: "1/10/2025", due: "1/24/2025", overdueDays: 210, renewed: "1/1" },
+    {
+      title: "Introduction to Algorithms",
+      author: "Thomas H. Cormen",
+      borrowed: "1/15/2025",
+      due: "1/29/2025",
+      overdueDays: 205,
+      renewed: "0/1",
+    },
+    {
+      title: "Computer Networks",
+      author: "Andrew S. Tanenbaum",
+      borrowed: "1/10/2025",
+      due: "1/24/2025",
+      overdueDays: 210,
+      renewed: "1/1",
+    },
   ],
   history: [
-    { title: "Database System Concepts", author: "Abraham Silberschatz", borrowed: "12/1/2024", returned: "12/15/2024" },
-    { title: "Software Engineering", author: "Ian Sommerville", borrowed: "11/15/2024", returned: "11/29/2024" },
-    { title: "Machine Learning", author: "Tom M. Mitchell", borrowed: "11/1/2024", returned: "11/16/2024" },
+    {
+      title: "Database System Concepts",
+      author: "Abraham Silberschatz",
+      borrowed: "12/1/2024",
+      returned: "12/15/2024",
+    },
+    {
+      title: "Software Engineering",
+      author: "Ian Sommerville",
+      borrowed: "11/15/2024",
+      returned: "11/29/2024",
+    },
+    {
+      title: "Machine Learning",
+      author: "Tom M. Mitchell",
+      borrowed: "11/1/2024",
+      returned: "11/16/2024",
+    },
   ],
 };
 
 export default function ProfilePage() {
   const [user, setUser] = useState(DEFAULT_USER);
   const [editing, setEditing] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const server = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken");
+    const token = cookies.get("authToken");
     if (!token) return;
 
-    fetch("http://127.0.0.1:8000/api/me", {
+    fetch(`${server}/api/me`, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
@@ -70,13 +105,12 @@ export default function ProfilePage() {
       });
   }, []);
 
-    
-    const save = async () => {
-      localStorage.setItem("libra_profile", JSON.stringify(user));
-      // setEditing(false);
+  const save = async () => {
+    localStorage.setItem("libra_profile", JSON.stringify(user));
+    // setEditing(false);
     try {
       const token = localStorage.getItem("authToken");
-      const res = await fetch("http://127.0.0.1:8000/api/me", {
+      const res = await fetch(`${server}/api/me`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -117,7 +151,6 @@ export default function ProfilePage() {
     }
   };
 
-
   // };
 
   return (
@@ -126,11 +159,16 @@ export default function ProfilePage() {
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
             <div className="h-16 w-16 rounded-full bg-gray-200 flex items-center justify-center text-lg font-semibold">
-              {(user.name || "JD").split(" ").map((s) => s[0]).join("")}
+              {(user.name || "JD")
+                .split(" ")
+                .map((s) => s[0])
+                .join("")}
             </div>
             <div>
               <h1 className="text-3xl font-bold">My Profile</h1>
-              <div className="text-gray-600">{user.role} · {user.department}</div>
+              <div className="text-gray-600">
+                {user.role} · {user.department}
+              </div>
             </div>
           </div>
           <button
@@ -146,21 +184,43 @@ export default function ProfilePage() {
         {/* Personal Information */}
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="font-semibold mb-4">Personal Information</h2>
-          <Field label="Email" value={user.email} editing={editing} onChange={(v)=>setUser({...user, email:v})} />
-          <Field label="Phone" value={user.phone} editing={editing} onChange={(v)=>setUser({...user, phone:v})} />
-          <Field label="Address" value={user.address} editing={editing} onChange={(v)=>setUser({...user, address:v})} />
+          <Field
+            label="Email"
+            value={user.email}
+            editing={editing}
+            onChange={(v) => setUser({ ...user, email: v })}
+          />
+          <Field
+            label="Phone"
+            value={user.phone}
+            editing={editing}
+            onChange={(v) => setUser({ ...user, phone: v })}
+          />
+          <Field
+            label="Address"
+            value={user.address}
+            editing={editing}
+            onChange={(v) => setUser({ ...user, address: v })}
+          />
         </div>
 
         {/* Borrowed Books */}
         <div className="md:col-span-2 bg-white rounded-2xl shadow p-6">
-          <h2 className="font-semibold mb-4">Currently Borrowed Books ({user.borrowed.length})</h2>
+          <h2 className="font-semibold mb-4">
+            Currently Borrowed Books ({user.borrowed.length})
+          </h2>
           <div className="space-y-4">
             {user.borrowed.map((b, i) => (
-              <div key={i} className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4">
+              <div
+                key={i}
+                className="flex items-center justify-between gap-4 rounded-xl border border-gray-200 p-4"
+              >
                 <div>
                   <div className="font-medium">{b.title}</div>
                   <div className="text-sm text-gray-600">{b.author}</div>
-                  <div className="text-xs text-gray-500">Borrowed: {b.borrowed} · Due: {b.due} · Renewed {b.renewed}</div>
+                  <div className="text-xs text-gray-500">
+                    Borrowed: {b.borrowed} · Due: {b.due} · Renewed {b.renewed}
+                  </div>
                 </div>
                 {b.overdueDays > 0 && (
                   <span className="text-xs bg-rose-100 text-rose-700 px-2 py-1 rounded-full">
@@ -175,9 +235,31 @@ export default function ProfilePage() {
         {/* Academic Info */}
         <div className="bg-white rounded-2xl shadow p-6">
           <h2 className="font-semibold mb-4">Academic Details</h2>
-          <Field label="Student ID" value={user.academic.studentId} editing={editing} onChange={(v)=>setUser({...user, academic:{...user.academic, studentId:v}})} />
-          <Field label="Department" value={user.department} editing={editing} onChange={(v)=>setUser({...user, department:v})} />
-          <Field label="Current Semester" value={user.academic.currentSemester} editing={editing} onChange={(v)=>setUser({...user, academic:{...user.academic, currentSemester:v}})} />
+          <Field
+            label="Student ID"
+            value={user.academic.studentId}
+            editing={editing}
+            onChange={(v) =>
+              setUser({ ...user, academic: { ...user.academic, studentId: v } })
+            }
+          />
+          <Field
+            label="Department"
+            value={user.department}
+            editing={editing}
+            onChange={(v) => setUser({ ...user, department: v })}
+          />
+          <Field
+            label="Current Semester"
+            value={user.academic.currentSemester}
+            editing={editing}
+            onChange={(v) =>
+              setUser({
+                ...user,
+                academic: { ...user.academic, currentSemester: v },
+              })
+            }
+          />
           {/* <Field label="Enrollment Date" value={user.enrollmentDate} editing={editing} onChange={(v)=>setUser({...user, academic:{...user.academic, enrollmentDate:v}})} /> */}
         </div>
 
@@ -206,9 +288,15 @@ export default function ProfilePage() {
 function Field({ label, value, editing, onChange }) {
   return (
     <div className="mb-3">
-      <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">{label}</div>
+      <div className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+        {label}
+      </div>
       {editing ? (
-        <input value={value || ""} onChange={(e) => onChange(e.target.value)} className="w-full h-10 rounded-lg border border-gray-300 px-3" />
+        <input
+          value={value || ""}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full h-10 rounded-lg border border-gray-300 px-3"
+        />
       ) : (
         <div className="text-gray-700">{value}</div>
       )}
