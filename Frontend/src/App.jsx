@@ -1,4 +1,4 @@
-// src/App.jsx
+//src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./state/AuthContext";
@@ -8,6 +8,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import AboutKFR from "./pages/About";
+import RulesAndRegulations from "./pages/RulesAndRegulations";
 import BookDetails from "./pages/BookDetails";
 import Books from "./pages/Books";
 import BookEdit from "./pages/BookEdit.jsx";
@@ -20,6 +21,7 @@ import ThesisEdit from "./pages/ThesisEdit.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import MyBorrows from "./pages/MyBorrows.jsx";
 import ManageBorrows from "./pages/ManageBorrows.jsx";
+import { Import } from "lucide-react";
 
 export default function App() {
   return (
@@ -35,6 +37,7 @@ export default function App() {
         <Route path="/resources/books" element={<Books />} />
         <Route path="/resources/thesis" element={<Thesis />} />
         <Route path="/about/kfr" element={<AboutKFR />} />
+        <Route path="/about/rules" element={<RulesAndRegulations/>}></Route>
         <Route path="/books/:id" element={<BookDetails />} />
         <Route path="/thesis/:id" element={<ThesisDetail />} />
         <Route path="/contact" element={<Contact />} />
