@@ -2,10 +2,17 @@
 
 **Team Members:**
 
-- Md. Aribur Rahman Dhruvo | aribur.cse.20220204003@aust.edu
-- Mohammad Yahya Bin Belal | yahya.cse.20220204004@aust.edu
-- Nazim Raian Khan | nazim.cse.20220204026@aust.edu
-- Mohymin Zawad | mohymin.cse.20210204061@aust.edu
+- Member 1 - Md. Aribur Rahman Dhruvo | aribur.cse.20220204003@aust.edu </br>
+ [![wakatime](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616.svg)](https://wakatime.com/badge/user/53321020-0332-4842-9551-15adf1c7024d/project/7c1af66b-9f76-4382-9075-bfcf48505616)
+
+- Member 2 - Mohammad Yahya Bin Belal | yahya.cse.20220204004@aust.edu </br>
+[![wakatime](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65.svg)](https://wakatime.com/badge/user/91444d8d-8ee5-4246-a579-3cdb56fed006/project/39f2c80e-5729-4273-be68-33e7a5407d65)
+
+- Member 3 - Nazim Raian Khan | nazim.cse.20220204026@aust.edu </br>
+[![wakatime](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece.svg)](https://wakatime.com/badge/user/05c510cd-06a7-4f8e-9e91-7e8a6f5cbee9/project/fd4998b5-85f5-4504-ba27-6c1cf2da9ece)
+
+- Member 4 - Mohymin Zawad | mohymin.cse.20210204061@aust.edu </br>
+[![wakatime](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf.svg)](https://wakatime.com/badge/user/c3c34631-addf-409a-b19f-6bf0fb04b554/project/df8db335-3ade-4048-86eb-d77139f680cf)
 
 **Project Live Link:** [libra-aust.vercel.app](https://libra-aust.vercel.app/) </br>
 **Recorded video:**
