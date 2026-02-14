@@ -382,4 +382,57 @@ class BorrowController extends Controller
             ], 500);
         }
     }
+    /**
+     * Extend due date (bonus feature for librarians)
+     */
+    public function extendDueDate(Request $request, $borrowId)
+    {
+        try {
+            $user = Auth::user();
+            if (!$user || $user->role !== 'librarian') {
+                return response()->json(['message' => 'Only librarians can extend due dates'], 403);
+            }
+
+            $request->validate([
+                'days' => 'required|integer|min:1|max:30'
+            ]);
+
+            return DB::transaction(function () use ($borrowId, $request) {
+                // Find the borrow record
+                $borrow = Borrow::where('id', $borrowId)
+                    ->whereIn('status', ['borrowed', 'overdue'])
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$borrow) {
+                    return response()->json(['message' => 'Borrow record not found or already returned'], 404);
+                }
+
+                $oldDueDate = $borrow->return_date;
+                $newDueDate = Carbon::parse($borrow->return_date)->addDays($request->days);
+
+                // Update due date and reset status to borrowed if it was overdue
+                $borrow->update([
+                    'return_date' => $newDueDate->toDateString(),
+                    'status' => 'borrowed',
+                    'total_fine' => 0 // Clear existing fine when extending
+                ]);
+
+                return response()->json([
+                    'message' => 'Due date extended successfully',
+                    'old_due_date' => $oldDueDate,
+                    'new_due_date' => $newDueDate->toDateString(),
+                    'extended_by' => $request->days . ' days',
+                    'borrow' => $borrow->load(['publication', 'borrower'])
+                ], 200);
+            });
+
+        } catch (\Exception $e) {
+            \Log::error('Extend due date failed: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to extend due date',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
