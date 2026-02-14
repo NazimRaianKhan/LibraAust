@@ -14,6 +14,15 @@ use Carbon\Carbon;
 
 class BorrowController extends Controller
 {
+    // Helper method to update overdue status
+    private function updateOverdueStatus()
+    {
+        // Update all borrowed books that are past due date to overdue status
+        Borrow::where('status', 'borrowed')
+            ->where('return_date', '<', Carbon::now()->toDateString())
+            ->update(['status' => 'overdue']);
+    }
+
     // Borrow a publication
     public function borrowPublication(Request $request, $publicationId)
     {
@@ -53,12 +62,12 @@ class BorrowController extends Controller
                     return response()->json(['message' => 'You have already borrowed this publication'], 400);
                 }
 
-                // Check borrowing limits (optional - you can set limits per user type)
+                // Check borrowing limits
                 $activeBorrows = Borrow::where('borrower_id', $user->id)
                     ->whereIn('status', ['borrowed', 'overdue'])
                     ->count();
 
-                $maxBorrows = $user->role === 'faculty' ? 10 : 3; // Faculty can borrow more
+                $maxBorrows = $user->role === 'faculty' ? 10 : 3;
                 if ($activeBorrows >= $maxBorrows) {
                     return response()->json(['message' => "You have reached your borrowing limit of {$maxBorrows} publications"], 400);
                 }
@@ -83,7 +92,7 @@ class BorrowController extends Controller
                 // Update publication available copies
                 $publication->decrement('available_copies');
 
-                // Update user borrowed_id (if you want to track last borrowed item)
+                // Update user borrowed_id
                 if ($user->role === 'student') {
                     Students::where('email', $user->email)->update(['borrowed_id' => $publicationId]);
                 } elseif ($user->role === 'faculty') {
@@ -120,7 +129,6 @@ class BorrowController extends Controller
             }
 
             return DB::transaction(function () use ($borrowId, $user) {
-                // Find the borrow record
                 $borrow = Borrow::with(['publication'])
                     ->where('id', $borrowId)
                     ->where('borrower_id', $user->id)
@@ -176,15 +184,13 @@ class BorrowController extends Controller
                 return response()->json(['message' => 'User not authenticated'], 401);
             }
 
+            // Update overdue status before fetching
+            $this->updateOverdueStatus();
+
             $borrows = Borrow::with(['publication'])
                 ->where('borrower_id', $user->id)
                 ->orderBy('created_at', 'desc')
                 ->get();
-
-            // Update overdue status
-            foreach ($borrows as $borrow) {
-                $borrow->updateStatus();
-            }
 
             return response()->json($borrows);
 
@@ -205,29 +211,32 @@ class BorrowController extends Controller
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 
+            // Update overdue status before fetching
+            $this->updateOverdueStatus();
+
             $query = Borrow::with(['publication', 'borrower']);
 
             // Filter by status if provided
             if ($request->has('status')) {
-                $query->where('status', $request->status);
+                if ($request->status === 'borrowed') {
+                    // When filtering by 'borrowed', include both borrowed and overdue (active books)
+                    $query->whereIn('status', ['borrowed', 'overdue']);
+                } else {
+                    $query->where('status', $request->status);
+                }
             }
 
-            // Filter by overdue
+            // Filter by overdue - now using the updated status field
             if ($request->has('overdue') && $request->overdue == 'true') {
-                $query->where('status', 'borrowed')
-                    ->where('return_date', '<', Carbon::now()->toDateString());
+                $query->where('status', 'overdue');
             }
 
-            $borrows = $query->orderBy('created_at', 'desc')->paginate(20);
-
-            // Update overdue status for all records
-            foreach ($borrows as $borrow) {
-                $borrow->updateStatus();
-            }
+            $borrows = $query->orderBy('created_at', 'desc')->get();
 
             return response()->json($borrows);
 
         } catch (\Exception $e) {
+            \Log::error('Get all borrows failed: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to fetch borrow records',
                 'error' => $e->getMessage()
@@ -244,12 +253,13 @@ class BorrowController extends Controller
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
 
+            // Update overdue status before calculating stats
+            $this->updateOverdueStatus();
+
             $stats = [
                 'total_borrowed' => Borrow::whereIn('status', ['borrowed', 'overdue'])->count(),
                 'total_returned' => Borrow::where('status', 'returned')->count(),
-                'overdue_count' => Borrow::where('status', 'borrowed')
-                    ->where('return_date', '<', Carbon::now()->toDateString())
-                    ->count(),
+                'overdue_count' => Borrow::where('status', 'overdue')->count(),
                 'total_fines' => Borrow::sum('total_fine'),
                 'active_borrowers' => Borrow::whereIn('status', ['borrowed', 'overdue'])
                     ->distinct('borrower_id')
@@ -259,6 +269,7 @@ class BorrowController extends Controller
             return response()->json($stats);
 
         } catch (\Exception $e) {
+            \Log::error('Get stats failed: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to fetch statistics',
                 'error' => $e->getMessage()
@@ -266,10 +277,7 @@ class BorrowController extends Controller
         }
     }
 
-    /**
-     * ----------------------------------------------------------------
-     * Manual return by librarian (offline return)
-     */
+    // Manual return by librarian (offline return)
     public function manualReturn(Request $request, $borrowId)
     {
         try {
@@ -279,7 +287,6 @@ class BorrowController extends Controller
             }
 
             return DB::transaction(function () use ($borrowId) {
-                // Find the borrow record
                 $borrow = Borrow::with(['publication'])
                     ->where('id', $borrowId)
                     ->whereIn('status', ['borrowed', 'overdue'])
@@ -309,7 +316,7 @@ class BorrowController extends Controller
                 // Update publication available copies
                 $borrow->publication->increment('available_copies');
 
-                // Update user borrowed_id to null (clear last borrowed item tracking)
+                // Update user borrowed_id to null
                 if ($borrow->borrower) {
                     if ($borrow->borrower->role === 'student') {
                         Students::where('email', $borrow->borrower->email)->update(['borrowed_id' => null]);
@@ -334,9 +341,7 @@ class BorrowController extends Controller
         }
     }
 
-    /**
-     * Clear fine (when payment received offline)
-     */
+    // Clear fine (when payment received offline)
     public function clearFine(Request $request, $borrowId)
     {
         try {
@@ -346,7 +351,6 @@ class BorrowController extends Controller
             }
 
             return DB::transaction(function () use ($borrowId) {
-                // Find the borrow record
                 $borrow = Borrow::where('id', $borrowId)
                     ->where('total_fine', '>', 0)
                     ->lockForUpdate()
@@ -374,60 +378,6 @@ class BorrowController extends Controller
             \Log::error('Clear fine failed: ' . $e->getMessage());
             return response()->json([
                 'message' => 'Failed to clear fine',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Extend due date (bonus feature for librarians)
-     */
-    public function extendDueDate(Request $request, $borrowId)
-    {
-        try {
-            $user = Auth::user();
-            if (!$user || $user->role !== 'librarian') {
-                return response()->json(['message' => 'Only librarians can extend due dates'], 403);
-            }
-
-            $request->validate([
-                'days' => 'required|integer|min:1|max:30'
-            ]);
-
-            return DB::transaction(function () use ($borrowId, $request) {
-                // Find the borrow record
-                $borrow = Borrow::where('id', $borrowId)
-                    ->whereIn('status', ['borrowed', 'overdue'])
-                    ->lockForUpdate()
-                    ->first();
-
-                if (!$borrow) {
-                    return response()->json(['message' => 'Borrow record not found or already returned'], 404);
-                }
-
-                $oldDueDate = $borrow->return_date;
-                $newDueDate = Carbon::parse($borrow->return_date)->addDays($request->days);
-
-                // Update due date and reset status to borrowed if it was overdue
-                $borrow->update([
-                    'return_date' => $newDueDate->toDateString(),
-                    'status' => 'borrowed',
-                    'total_fine' => 0 // Clear existing fine when extending
-                ]);
-
-                return response()->json([
-                    'message' => 'Due date extended successfully',
-                    'old_due_date' => $oldDueDate,
-                    'new_due_date' => $newDueDate->toDateString(),
-                    'extended_by' => $request->days . ' days',
-                    'borrow' => $borrow->load(['publication', 'borrower'])
-                ], 200);
-            });
-
-        } catch (\Exception $e) {
-            \Log::error('Extend due date failed: ' . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to extend due date',
                 'error' => $e->getMessage()
             ], 500);
         }
